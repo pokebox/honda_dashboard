@@ -45,17 +45,41 @@ void HondaCAN::run()
     case ENGINE_DATA_3_ID:
       this->parseEngineData3(message.data);
       break;
-    case ENGINE_DATA_2_ID:
-      this->parseEngineData2(message.data);
+    case ENGINE_DATA_ID:          // 注意：从ENGINE_DATA_2_ID改为ENGINE_DATA_ID
+      this->parseEngineData(message.data);
+      break;
+    case DOORS_STATUS_ID:         // 新增车门状态解析
+      this->parseDoorsStatus(message.data);
       break;
     }
   }
 }
 
-void HondaCAN::parseEngineData2(uint8_t data[8]) {
-  EngineDataTwo.XMISSION_SPEED = (((uint16_t)data[0] << 8) | data[1]) * 0.01f;
-  EngineDataTwo.XMISSION_SPEED_SPEEDOMETER = (((uint16_t)data[4] << 8) | data[5]) * 0.01f;
-  EngineDataTwo.CURRENT_TRIP_DISTANCE = (uint16_t) data[6] * 10;
+// 解析POWERTRAIN_DATA (ID: 380)
+void HondaCAN::parsePowertrainData(uint8_t data[8])
+{
+  Powertrain.PEDAL_GAS = data[0];
+  Powertrain.ENGINE_RPM = (uint16_t)(data[2] << 8 | data[3]);
+  Powertrain.GAS_PRESSED = (data[4] >> 7) & 0x01;
+  Powertrain.ACC_STATUS = (data[4] >> 6) & 0x01;        // 新增
+  Powertrain.BOH_17C = data[4] & 0x1F;                  // 新增：37|5 bits
+  Powertrain.BRAKE_SWITCH = (data[4] >> 0) & 0x01;
+  Powertrain.BOH2_17C = data[5] & 0x03;                 // 新增：47|2 bits (实际是10位，但需要跨字节处理)
+  Powertrain.BOH2_17C |= (data[6] & 0xFF) << 2;         // 继续处理剩余的8位
+  Powertrain.BRAKE_PRESSED = (data[6] >> 5) & 0x01;
+  Powertrain.BOH3_17C = (data[6] >> 0) & 0x1F;          // 新增：52|5 bits
+  Powertrain.COUNTER = (data[7] >> 6) & 0x03;           // 新增：61|2 bits
+  Powertrain.CHECKSUM = (data[7] >> 2) & 0x0F;          // 新增：59|4 bits
+}
+
+// 解析ENGINE_DATA (ID: 344) - 原ENGINE_DATA_2
+void HondaCAN::parseEngineData(uint8_t data[8]) {
+  EngineData.XMISSION_SPEED = (((uint16_t)data[0] << 8) | data[1]) * 0.01f;
+  EngineData.ENGINE_RPM = ((uint16_t)data[2] << 8) | data[3];  // 新增
+  EngineData.XMISSION_SPEED2 = (((uint16_t)data[4] << 8) | data[5]) * 0.01f;  // 新增
+  EngineData.ODOMETER = data[6] * 10;                         // 新增：单位是10米
+  EngineData.COUNTER = (data[7] >> 6) & 0x03;                 // 新增：61|2 bits
+  EngineData.CHECKSUM = (data[7] >> 2) & 0x0F;                // 新增：59|4 bits
 }
 
 void HondaCAN::parseEngineData3(uint8_t data[8]) {
@@ -68,20 +92,17 @@ void HondaCAN::parseDriveModes(uint8_t data[8]) {
   DriveModes.ECON_ON = ((data[2] >> 0) & 0x01);
 }
 
+// 解析VSA_STATUS (ID: 420)
 void HondaCAN::parseVsaStatus(uint8_t data[8])
 {
   VsaStatus.USER_BRAKE = ((uint16_t)data[0] << 8) | data[1];
-  //VsaStatus.COMPUTER_BRAKING = (data[2] >> 7) & 0x01;
-  VsaStatus.ESP_DISABLED = (data[3] >> 5) & 0x01;
-}
-
-void HondaCAN::parsePowertrainData(uint8_t data[8])
-{
-  Powertrain.PEDAL_GAS = data[0];
-  Powertrain.ENGINE_RPM = (uint16_t)(data[2] << 8 | data[3]);
-  Powertrain.GAS_PRESSED = (data[4] >> 7) & 0x01;
-  Powertrain.BRAKE_SWITCH = (data[4] >> 0) & 0x01;
-  Powertrain.BRAKE_PRESSED = (data[6] >> 5) & 0x01;
+  VsaStatus.COMPUTER_BRAKING = (data[2] >> 7) & 0x01;          // 新增：23|1 bit
+  VsaStatus.ESP_DISABLED = (data[3] >> 5) & 0x01;              // 28|1 bit
+  VsaStatus.BRAKE_HOLD_RELATED = (data[6] >> 4) & 0x01;        // 新增：52|1 bit
+  VsaStatus.BRAKE_HOLD_ACTIVE = (data[5] >> 6) & 0x01;         // 新增：46|1 bit
+  VsaStatus.BRAKE_HOLD_ENABLED = (data[5] >> 5) & 0x01;        // 新增：45|1 bit
+  VsaStatus.COUNTER = (data[7] >> 6) & 0x03;                   // 新增：61|2 bits
+  VsaStatus.CHECKSUM = (data[7] >> 2) & 0x0F;                  // 新增：59|4 bits
 }
 
 void HondaCAN::parseGearbox(uint8_t data[8])
@@ -99,6 +120,19 @@ void HondaCAN::parseCarSpeed(uint8_t data[8])
 // void deviceVoltage(void) {
 //   return analogRead(SENSE_V_ANA);
 // }
+
+// 新增：解析DOORS_STATUS (ID: 1029)
+void HondaCAN::parseDoorsStatus(uint8_t data[8])
+{
+  DoorsStatus.DOOR_OPEN_FL = (data[4] >> 5) & 0x01;     // 37|1 bit
+  DoorsStatus.DOOR_OPEN_FR = (data[4] >> 6) & 0x01;     // 38|1 bit
+  DoorsStatus.DOOR_OPEN_RL = (data[4] >> 7) & 0x01;     // 39|1 bit
+  DoorsStatus.DOOR_OPEN_RR = (data[5] >> 0) & 0x01;     // 40|1 bit
+  DoorsStatus.TRUNK_OPEN = (data[5] >> 1) & 0x01;       // 41|1 bit
+  DoorsStatus.COUNTER = (data[7] >> 6) & 0x03;          // 61|2 bits
+  DoorsStatus.CHECKSUM = (data[7] >> 2) & 0x0F;         // 59|4 bits
+}
+
 
 void HondaCAN::obd2_send(uint8_t mode, uint8_t pid)
 {
