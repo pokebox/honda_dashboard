@@ -85,14 +85,14 @@ lv_obj_t* create_label_group(lv_obj_t* parent, const char* title, const char* in
     lv_obj_t* title_label = lv_label_create(container);
     lv_label_set_text(title_label, title);
     lv_obj_set_style_text_color(title_label, COLOR_TEXT_SECONDARY, 0);
-    lv_obj_set_style_text_font(title_label, &simhei_14, 0);  // 使用更小的字体
+    lv_obj_set_style_text_font(title_label, &dengxian_14, 0);  // 使用更小的字体
     lv_obj_align(title_label, LV_ALIGN_TOP_MID, 0, 2);  // 减少顶部边距
     
     // 创建内容标签
     lv_obj_t* content_label = lv_label_create(container);
     lv_label_set_text(content_label, initial_text);
     lv_obj_set_style_text_color(content_label, COLOR_TEXT_MAIN, 0);
-    lv_obj_set_style_text_font(content_label, &simhei_14, 0);
+    lv_obj_set_style_text_font(content_label, &dengxian_14, 0);
     lv_obj_align(content_label, LV_ALIGN_CENTER, 0, 5);
     
     return content_label;
@@ -100,19 +100,19 @@ lv_obj_t* create_label_group(lv_obj_t* parent, const char* title, const char* in
 
 // 修改后的创建门状态指示器函数 - 5个门全部放在一行
 void create_door_indicators(lv_obj_t* parent, lv_coord_t start_x, lv_coord_t start_y) {
-    const char* door_names[] = {"驾驶门", "副驾门", "左后门", "右后门", "后备箱"};
+    const char* door_names[] = {"主驾", "副驾", "左后", "右后", "后备箱"};
     
     // 计算门状态指示器的布局 - 5个门全部放在一行
     const int total_doors = 5;
     const lv_coord_t screen_width = 480;
-    const lv_coord_t item_width = 80;   // 每个门状态容器的宽度
-    const lv_coord_t item_height = 40;  // 每个门状态容器的高度
+    const lv_coord_t item_width = 85;   // 每个门状态容器的宽度
+    const lv_coord_t item_height = 45;  // 每个门状态容器的高度
     
     // 计算每个门之间的间距
     // 总占用宽度 = 5个门 * 80 = 400像素
     // 剩余空间 = 480 - 400 = 80像素
     // 需要4个间距，每个间距 = 80 / 4 = 20像素
-    const lv_coord_t horizontal_spacing = 20;
+    const lv_coord_t horizontal_spacing = 5;
     
     for (int i = 0; i < total_doors; i++) {
         // 计算位置：起始x + i*(宽度+间距)
@@ -141,7 +141,7 @@ void create_door_indicators(lv_obj_t* parent, lv_coord_t start_x, lv_coord_t sta
         lv_obj_t* name_label = lv_label_create(door_container);
         lv_label_set_text(name_label, door_names[i]);
         lv_obj_set_style_text_color(name_label, COLOR_TEXT_MAIN, 0);
-        lv_obj_set_style_text_font(name_label, &simhei_14, 0);
+        lv_obj_set_style_text_font(name_label, &dengxian_14, 0);
         lv_obj_set_style_text_align(name_label, LV_TEXT_ALIGN_CENTER, 0);
         lv_obj_align(name_label, LV_ALIGN_CENTER, 4, 0);
         
@@ -172,7 +172,7 @@ void create_dashboard() {
     lv_obj_t* title_label = lv_label_create(scr);
     lv_label_set_text(title_label, "Honda 车辆状态监控");
     lv_obj_set_style_text_color(title_label, COLOR_ACCENT, 0);
-    lv_obj_set_style_text_font(title_label, &simhei_14, 0);
+    lv_obj_set_style_text_font(title_label, &dengxian_14, 0);
     lv_obj_align(title_label, LV_ALIGN_TOP_MID, 0, 5);
     
     // 第一行：主要驾驶信息 - 使用网格布局
