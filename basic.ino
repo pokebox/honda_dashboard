@@ -106,7 +106,7 @@ void create_door_indicators(lv_obj_t* parent, lv_coord_t start_x, lv_coord_t sta
     const int total_doors = 5;
     const lv_coord_t screen_width = 480;
     const lv_coord_t item_width = 85;   // 每个门状态容器的宽度
-    const lv_coord_t item_height = 45;  // 每个门状态容器的高度
+    const lv_coord_t item_height = 50;  // 每个门状态容器的高度
     
     // 计算每个门之间的间距
     // 总占用宽度 = 5个门 * 80 = 400像素
@@ -131,7 +131,7 @@ void create_door_indicators(lv_obj_t* parent, lv_coord_t start_x, lv_coord_t sta
         
         // 创建状态指示灯
         lv_obj_t* indicator = lv_obj_create(door_container);
-        lv_obj_set_size(indicator, 8, 8);
+        lv_obj_set_size(indicator, 12, 12);
         lv_obj_set_style_bg_color(indicator, COLOR_DOOR_CLOSED, 0);
         lv_obj_set_style_bg_opa(indicator, LV_OPA_COVER, 0);
         lv_obj_set_style_radius(indicator, 4, 0);
@@ -142,10 +142,11 @@ void create_door_indicators(lv_obj_t* parent, lv_coord_t start_x, lv_coord_t sta
         lv_label_set_text(name_label, door_names[i]);
         lv_obj_set_style_text_color(name_label, COLOR_TEXT_MAIN, 0);
         lv_obj_set_style_text_font(name_label, &dengxian_14, 0);
-        lv_obj_set_style_text_align(name_label, LV_TEXT_ALIGN_CENTER, 0);
-        lv_obj_align(name_label, LV_ALIGN_CENTER, 4, 0);
+        lv_obj_set_style_text_align(name_label, LV_TEXT_ALIGN_RIGHT, 0);
+        lv_obj_align(name_label, LV_ALIGN_TOP_RIGHT /*LV_ALIGN_RIGHT_MID*/, 4, 0);
         
         door_labels[i] = indicator;  // 保存指示灯对象
+        label_doors[i] = name_label;  // 保存标签对象
     }
 }
 
@@ -157,6 +158,10 @@ void update_door_status(uint8_t door_fl, uint8_t door_fr, uint8_t door_rl, uint8
         if (door_labels[i]) {
             lv_color_t color = door_states[i] ? COLOR_DOOR_OPEN : COLOR_DOOR_CLOSED;
             lv_obj_set_style_bg_color(door_labels[i], color, 0);
+        }
+        if (label_doors[i]) {
+          lv_color_t color = door_states[i] ? COLOR_DOOR_OPEN : COLOR_TEXT_MAIN;
+          lv_obj_set_style_text_color(label_doors[i], color, 0);
         }
     }
 }
@@ -227,7 +232,6 @@ void setup() {
     // TFT背光
     pinMode(TFT_LED, OUTPUT);
     digitalWrite(TFT_LED, HIGH);
-    Serial.println("显示屏背光已开启");
 
     // 初始化显示屏
     tft->begin();
@@ -255,8 +259,6 @@ void setup() {
 
     // 创建仪表盘界面
     create_dashboard();
-    Serial.println("仪表盘界面创建完成");
-    
     Serial.println("系统启动完成!");
 }
 
@@ -264,14 +266,11 @@ void update_dashboard() {
     static uint32_t last_update = 0;
     uint32_t now = millis();
     
-    // // 每100ms更新一次（10Hz刷新率）
-    // if (now - last_update < 100) {
+    // 调整更新频率
+    // if (now - last_update < 20) {
     //     return;
     // }
-    
-    // 处理CAN消息
-    CAN.run();
-    
+  
     // 获取车辆数据
     uint16_t rpm = CAN.Powertrain.ENGINE_RPM;
     float speed = CAN.CarSpeed.ROUGH_CAR_SPEED_3;
@@ -282,7 +281,7 @@ void update_dashboard() {
     uint8_t intake_temp = CAN.EngineDataThree.INTAKE_TEMP;
     float fuel_consumed = CAN.EngineDataThree.TRIP_FUEL_CONSUMED;
     float transmission_speed = CAN.EngineData.XMISSION_SPEED;
-    uint8_t trip_distance = CAN.EngineData.ODOMETER;
+    uint8_t trip_distance = CAN.EngineData.ODOMETER;    // 里程m
     bool door_fl = CAN.DoorsStatus.DOOR_OPEN_FL;
     bool door_fr = CAN.DoorsStatus.DOOR_OPEN_FR;
     bool door_rl = CAN.DoorsStatus.DOOR_OPEN_RL;
@@ -379,8 +378,8 @@ void update_dashboard() {
     
     // 串口输出调试信息（每秒一次）
 
-        Serial.printf("RPM: %d, Speed: %.1f, Gear: %d, Engine: %d°C, Intake: %d°C, Fuel: %.2fL\n",
-          rpm, speed, gear, engine_temp, intake_temp, fuel_consumed);
+        // Serial.printf("RPM: %d, Speed: %.1f, Gear: %d, Engine: %d°C, Intake: %d°C, Fuel: %.2fL\n",
+        //   rpm, speed, gear, engine_temp, intake_temp, fuel_consumed);
     
     last_update = now;
 }
@@ -389,6 +388,8 @@ void loop() {
     //static uint32_t last_tick = 0;
     //uint32_t now = millis();
     
+    // 处理CAN消息
+    CAN.run();
     // 更新LVGL tick（每5ms）
     // if (now - last_tick >= 5) {
         lv_tick_inc(1);
