@@ -3,58 +3,42 @@
 
 // CAN FRAME IDs
 // 快速周期0.04s左右频率更新，约为20Hz
-// 344 380 | 304 330 148 274 320
-#define ENGINE_DATA_ID 344 // 注意：从 ENGINE_DATA_2_ID 改为 ENGINE_DATA_ID
+#define ENGINE_DATA_ID 344
+#define ENGINE_DATA_2_ID 344
 #define POWERTRAIN_DATA_ID 380
-//增加的
 #define GAS_PEDAL_2_ID 304
 #define STEERING_SENSORS_ID 330
 #define KINEMATICS_ALT_ID 148
 
 // 0.08s左右频率更新，约为10Hz
-// 420 432 464 490 | 427 493 450 | 470 476 507 428
 #define VSA_STATUS_ID 420
-
 #define STANDSTILL_ID 432
 #define WHEEL_SPEEDS_ID 464
 #define VEHICLE_DYNAMICS_ID 490
-
 #define STEER_MOTOR_TORQUE_ID 427
 #define HUD_SETTING_ID 493
 #define EPB_STATUS_ID 450
 
 // 0.16s左右频率更新，约为5Hz
-// 545 | 597 662 | 57
-#define DRIVE_MODES_ID 545
-
+#define ECON_STATUS_ID 545 // DRIVE_MODES_ID
 #define ROUGH_WHEEL_SPEED_ID 597
 #define SCM_BUTTONS_ID 662
 
 // 0.4s左右频率更新，约为2.5Hz
-// 777 804 795 806 881 882 884 888 891 918 800 808 815 825 846 773
 #define CAR_SPEED_ID 777
-#define CRUISE_ID 804
-
+#define CRUISE_ID 804 // ENGINE_DATA_3_ID
 #define SCM_FEEDBACK_ID 806
 #define STALK_STATUS_ID 884
 #define STALK_STATUS_2_ID 891
 #define SEATBELT_STATUS_ID 773
 
 // 0.8s左右频率更新，约为1.25Hz
-// 929 983 985
-// 1.2s左右频率更新，约为0.8Hz
-// 1029 1115 1064 1024 1036 1108 1125 1127
-#define DOORS_STATUS_ID 1029 // 添加车门状态ID
-// 2s左右频率更新，约为0.5Hz
-// 1302 1296 1365 1361 1633
+#define DOORS_STATUS_ID 1029
 #define ODOMETER_ID 1302
 
-// 4s左右频率更新，约为0.25Hz
-// 1424
-
-// 变速箱ID
-#define GEARBOX_ID 401     // 注意：之前是 422，根据DBC应该是401
-#define GEARBOX_422_ID 422 // 如果同时存在两个变速箱ID
+// 没有出现的
+#define GEARBOX_ID 422
+#define GEARBOX_CVT_ID 401
 
 typedef enum
 {
@@ -72,7 +56,6 @@ typedef enum
     ECON_ON = 3
 } ECON_t;
 
-// Enum for SCM_BUTTONS.CRUISE_BUTTONS
 typedef enum
 {
     CRUISE_BUTTON_NONE = 0,
@@ -85,14 +68,12 @@ typedef enum
     CRUISE_BUTTON_TBD_7 = 7
 } CRUISE_BUTTONS_t;
 
-// Enum for SCM_FEEDBACK.CBMS_BUTTON
 typedef enum
 {
     CMBS_BUTTON_RELEASED = 0,
     CMBS_BUTTON_PRESSED = 3
 } CMBS_BUTTON_t;
 
-// Enum for EPB_STATUS.EPB_STATE
 typedef enum
 {
     EPB_STATE_OFF = 0,
@@ -101,62 +82,283 @@ typedef enum
     EPB_STATE_ON = 3
 } EPB_STATE_t;
 
+// ================== 结构体定义 ==================
+
 // ID: 380 - POWERTRAIN_DATA 动力总成数据
 typedef struct
 {
     uint8_t PEDAL_GAS;     // 油门踏板 [0|255]
     uint16_t ENGINE_RPM;   // 发动机转速 [0|15000] rpm
-    uint8_t GAS_PRESSED;   // 
-    uint8_t ACC_STATUS;    //
-    uint8_t BOH_17C;       //
-    uint8_t BRAKE_SWITCH;  //
-    uint8_t BOH2_17C;      //
-    uint8_t BRAKE_PRESSED; //
-    uint8_t BOH3_17C;      //
-    uint8_t COUNTER;       //
-    uint8_t CHECKSUM;      //
+    uint8_t GAS_PRESSED;   // 油门是否被按下 [0|1]
+    uint8_t ACC_STATUS;    // ACC状态 [0|1]
+    uint8_t BOH_17C;       // 位37-41 (5 bits)
+    uint8_t BRAKE_SWITCH;  // 刹车开关 [0|1]
+    uint16_t BOH2_17C;     // 位47-56 (10 bits)
+    uint8_t BRAKE_PRESSED; // 刹车是否被按下 [0|1]
+    uint8_t BOH3_17C;      // 位52-56 (5 bits)
+    uint8_t COUNTER;       // 计数器 [0|3]
+    uint8_t CHECKSUM;      // 校验和 [0|15]
 } POWERTRAIN_DATA;
 
 // ID: 344 - ENGINE_DATA 发动机数据
 typedef struct
 {
-    float XMISSION_SPEED;  //
-    uint16_t ENGINE_RPM;   //
-    float XMISSION_SPEED2; //
-    uint16_t ODOMETER;     //
-    uint8_t COUNTER;       //
-    uint8_t CHECKSUM;      //
+    float XMISSION_SPEED;  // 变速箱速度 (kph)
+    uint16_t ENGINE_RPM;   // 发动机转速 [0|15000] rpm
+    float XMISSION_SPEED2; // 变速箱速度2 (kph)
+    uint16_t ODOMETER;     // 里程表 (单位: 10米)
+    uint8_t COUNTER;       // 计数器 [0|3]
+    uint8_t CHECKSUM;      // 校验和 [0|15]
 } ENGINE_DATA;
 
-// ID: 420 - VSA_STATUS 车辆状态数据
+// ID: 304 - GAS_PEDAL_2 油门踏板数据2
 typedef struct
 {
-    uint16_t USER_BRAKE;        //
-    uint8_t COMPUTER_BRAKING;   //
-    uint8_t ESP_DISABLED;       //
-    uint8_t BRAKE_HOLD_RELATED; //
-    uint8_t BRAKE_HOLD_ACTIVE;  //
-    uint8_t BRAKE_HOLD_ENABLED; //
-    uint8_t COUNTER;            //
-    uint8_t CHECKSUM;           //
+    int16_t ENGINE_TORQUE_ESTIMATE; // 发动机扭矩估计 [-1000|1000] Nm
+    int16_t ENGINE_TORQUE_REQUEST;  // 发动机扭矩请求 [-1000|1000] Nm
+    uint8_t CAR_GAS;                // 油门踏板 [0|255]
+    uint8_t COUNTER;                // 计数器 [0|3]
+    uint8_t CHECKSUM;               // 校验和 [0|15]
+} GAS_PEDAL_2;
+
+// ID: 330 - STEERING_SENSORS 转向传感器数据
+typedef struct
+{
+    float STEER_ANGLE;          // 转向角度 [-500|500] deg
+    float STEER_ANGLE_RATE;     // 转向角速度 [-3000|3000] deg/s
+    uint8_t STEER_SENSOR_STATUS_1; // 转向传感器状态1 [0|1]
+    uint8_t STEER_SENSOR_STATUS_2; // 转向传感器状态2 [0|1]
+    uint8_t STEER_SENSOR_STATUS_3; // 转向传感器状态3 [0|1]
+    float STEER_WHEEL_ANGLE;    // 转向盘角度 [-500|500] deg
+    uint8_t COUNTER;            // 计数器 [0|3]
+    uint8_t CHECKSUM;           // 校验和 [0|15]
+} STEERING_SENSORS;
+
+// ID: 148 - KINEMATICS_ALT 运动学数据（替代）
+typedef struct
+{
+    float LAT_ACCEL;    // 横向加速度 [-20|20] m/s²
+    float LONG_ACCEL;   // 纵向加速度 [-20|20] m/s²
+    uint8_t CHECKSUM;   // 校验和 [0|3]
+    uint8_t COUNTER;    // 计数器 [0|3]
+} KINEMATICS_ALT;
+
+// ID: 420 - VSA_STATUS 车辆稳定性控制系统状态
+typedef struct
+{
+    float USER_BRAKE;         // 用户刹车 [0|1000] (单位: 0.015625, 偏移: -1.609375)
+    uint8_t COMPUTER_BRAKING; // 电脑刹车 [0|1]
+    uint8_t ESP_DISABLED;     // ESP禁用 [0|1]
+    uint8_t BRAKE_HOLD_RELATED; // 刹车保持相关 [0|1]
+    uint8_t BRAKE_HOLD_ACTIVE;  // 刹车保持激活 [0|1]
+    uint8_t BRAKE_HOLD_ENABLED; // 刹车保持启用 [0|1]
+    uint8_t COUNTER;           // 计数器 [0|3]
+    uint8_t CHECKSUM;          // 校验和 [0|15]
 } VSA_STATUS;
 
-// ID: 1029 - DOORS_STATUS 车门状态数据
+// ID: 432 - STANDSTILL 静止状态
 typedef struct
 {
-    uint8_t DOOR_OPEN_FL; //
-    uint8_t DOOR_OPEN_FR; //
-    uint8_t DOOR_OPEN_RL; //
-    uint8_t DOOR_OPEN_RR; //
-    uint8_t TRUNK_OPEN;   //
-    uint8_t COUNTER;      //
-    uint8_t CHECKSUM;     //
+    uint8_t CONTROLLED_STANDSTILL; // 受控静止 [0|1]
+    uint8_t WHEELS_MOVING;         // 车轮移动 [0|1]
+    uint8_t BRAKE_ERROR_1;         // 刹车错误1 [0|1]
+    uint8_t BRAKE_ERROR_2;         // 刹车错误2 [0|1]
+    uint8_t COUNTER;               // 计数器 [0|3]
+    uint8_t CHECKSUM;              // 校验和 [0|3]
+} STANDSTILL;
+
+// ID: 464 - WHEEL_SPEEDS 车轮速度
+typedef struct
+{
+    float WHEEL_SPEED_FL; // 左前轮速度 [0|250] kph
+    float WHEEL_SPEED_FR; // 右前轮速度 [0|250] kph
+    float WHEEL_SPEED_RL; // 左后轮速度 [0|250] kph
+    float WHEEL_SPEED_RR; // 右后轮速度 [0|250] kph
+    uint8_t CHECKSUM;     // 校验和 [0|3]
+} WHEEL_SPEEDS;
+
+// ID: 490 - VEHICLE_DYNAMICS 车辆动力学数据
+typedef struct
+{
+    float LAT_ACCEL;  // 横向加速度 [-20|20] m/s²
+    float LONG_ACCEL; // 纵向加速度 [-20|20] m/s²
+    uint8_t COUNTER;  // 计数器 [0|3]
+    uint8_t CHECKSUM; // 校验和 [0|3]
+} VEHICLE_DYNAMICS;
+
+// ID: 427 - STEER_MOTOR_TORQUE 转向电机扭矩
+typedef struct
+{
+    uint8_t CONFIG_VALID;    // 配置有效 [0|1]
+    uint16_t MOTOR_TORQUE;   // 电机扭矩 [0|256]
+    uint8_t OUTPUT_DISABLED; // 输出禁用 [0|1]
+    uint8_t COUNTER;         // 计数器 [0|3]
+    uint8_t CHECKSUM;        // 校验和 [0|15]
+} STEER_MOTOR_TORQUE;
+
+// ID: 450 - EPB_STATUS 电子驻车制动状态
+typedef struct
+{
+    uint8_t EPB_BRAKE_AND_PULL; // EPB刹车和拉动 [0|1]
+    uint8_t EPB_ACTIVE;         // EPB激活 [0|1]
+    uint8_t EPB_STATE;          // EPB状态 (枚举: 0=disengaged, 1=engaging, 2=disengaging, 3=engaged)
+    uint8_t CHECKSUM;           // 校验和 [0|15]
+    uint8_t COUNTER;            // 计数器 [0|3]
+} EPB_STATUS;
+
+// ID: 545 - ECON_STATUS 经济模式状态
+typedef struct
+{
+    uint8_t ECON_ON_2;  // 经济模式2 [0|3]
+    uint8_t ECON_ON;    // 经济模式 [0|1]
+    uint8_t CHECKSUM;   // 校验和 [0|3]
+    uint8_t COUNTER;    // 计数器 [0|3]
+} ECON_STATUS;
+
+// ID: 597 - ROUGH_WHEEL_SPEED 粗略车轮速度
+typedef struct
+{
+    uint8_t WHEEL_SPEED_FL; // 左前轮速度 [0|255] kph
+    uint8_t WHEEL_SPEED_FR; // 右前轮速度 [0|255] kph
+    uint8_t WHEEL_SPEED_RL; // 左后轮速度 [0|255] kph
+    uint8_t WHEEL_SPEED_RR; // 右后轮速度 [0|255] kph
+    uint8_t SET_TO_X55;     // 设置为0x55 [0|255]
+    uint8_t SET_TO_X55_2;   // 设置为0x55_2 [0|255]
+    uint8_t LONG_COUNTER;   // 长计数器 [0|255]
+    uint8_t CHECKSUM;       // 校验和 [0|15]
+    uint8_t COUNTER;        // 计数器 [0|3]
+} ROUGH_WHEEL_SPEED;
+
+// ID: 662 - SCM_BUTTONS 方向盘控制按钮
+typedef struct
+{
+    uint8_t CRUISE_BUTTONS; // 巡航按钮 (枚举: 0=none, 1=main, 2=cancel, 3=decel_set, 4=accel_res)
+    uint8_t CRUISE_SETTING; // 巡航设置 [0|3]
+    uint8_t CHECKSUM;       // 校验和 [0|3]
+    uint8_t COUNTER;        // 计数器 [0|3]
+} SCM_BUTTONS;
+
+// ID: 773 - SEATBELT_STATUS 安全带状态
+typedef struct
+{
+    uint8_t SEATBELT_DRIVER_LAMP;      // 驾驶员安全带灯 [0|1]
+    uint8_t SEATBELT_PASS_UNLATCHED;   // 乘客安全带未锁 [0|1]
+    uint8_t SEATBELT_PASS_LATCHED;     // 乘客安全带已锁 [0|1]
+    uint8_t SEATBELT_DRIVER_UNLATCHED; // 驾驶员安全带未锁 [0|1]
+    uint8_t SEATBELT_DRIVER_LATCHED;   // 驾驶员安全带已锁 [0|1]
+    uint8_t PASS_AIRBAG_OFF;           // 乘客安全气囊关闭 [0|1]
+    uint8_t PASS_AIRBAG_ON;            // 乘客安全气囊开启 [0|1]
+    uint8_t COUNTER;                   // 计数器 [0|3]
+    uint8_t CHECKSUM;                  // 校验和 [0|3]
+} SEATBELT_STATUS;
+
+// ID: 777 - CAR_SPEED 车速
+typedef struct
+{
+    uint8_t ROUGH_CAR_SPEED;     // 粗略车速 [0|255] mph
+    float CAR_SPEED;             // 车速 [0|65535] kph
+    float ROUGH_CAR_SPEED_3;     // 粗略车速3 [0|65535] kph
+    uint8_t ROUGH_CAR_SPEED_2;   // 粗略车速2 [0|255] mph
+    uint8_t LOCK_STATUS;         // 锁定状态 [0|255]
+    uint8_t COUNTER;             // 计数器 [0|3]
+    uint8_t CHECKSUM;            // 校验和 [0|15]
+    uint8_t IMPERIAL_UNIT;       // 英制单位 [0|1]
+} CAR_SPEED;
+
+// ID: 806 - SCM_FEEDBACK 方向盘控制反馈
+typedef struct
+{
+    uint8_t DRIVERS_DOOR_OPEN; // 驾驶员门开 [0|1]
+    uint8_t REVERSE_LIGHT;     // 倒车灯 [0|1]
+    uint8_t CMBS_BUTTON;       // CMBS按钮 (枚举: 0=released, 3=pressed)
+    uint8_t LEFT_BLINKER;      // 左转向灯 [0|1]
+    uint8_t RIGHT_BLINKER;     // 右转向灯 [0|1]
+    uint8_t MAIN_ON;           // 主开关开启 [0|1]
+    uint8_t PARKING_BRAKE_ON;  // 驻车制动开启 [0|1]
+    uint8_t COUNTER;           // 计数器 [0|3]
+    uint8_t CHECKSUM;          // 校验和 [0|15]
+} SCM_FEEDBACK;
+
+// ID: 884 - STALK_STATUS 拨杆状态
+typedef struct
+{
+    uint8_t DASHBOARD_ALERT;  // 仪表盘警报 [0|255]
+    uint8_t AUTO_HEADLIGHTS;  // 自动头灯 [0|1]
+    uint8_t HIGH_BEAM_HOLD;   // 远光保持 [0|1]
+    uint8_t HIGH_BEAM_FLASH;  // 远光闪烁 [0|1]
+    uint8_t HEADLIGHTS_ON;    // 头灯开启 [0|1]
+    uint8_t WIPER_SWITCH;     // 雨刷开关 [0|3]
+    uint8_t COUNTER;          // 计数器 [0|3]
+    uint8_t CHECKSUM;         // 校验和 [0|15]
+} STALK_STATUS;
+
+// ID: 891 - STALK_STATUS_2 拨杆状态2
+typedef struct
+{
+    uint8_t WIPERS;       // 雨刷状态 (枚举: 0=Off, 2=Low, 4=High)
+    uint8_t LOW_BEAMS;    // 近光灯 [0|1]
+    uint8_t HIGH_BEAMS;   // 远光灯 [0|1]
+    uint8_t PARK_LIGHTS;  // 停车灯 [0|1]
+    uint8_t COUNTER;      // 计数器 [0|3]
+    uint8_t CHECKSUM;     // 校验和 [0|15]
+} STALK_STATUS_2;
+
+// ID: 1029 - DOORS_STATUS 车门状态
+typedef struct
+{
+    uint8_t DOOR_OPEN_FL; // 左前门开 [0|1]
+    uint8_t DOOR_OPEN_FR; // 右前门开 [0|1]
+    uint8_t DOOR_OPEN_RL; // 左后门开 [0|1]
+    uint8_t DOOR_OPEN_RR; // 右后门开 [0|1]
+    uint8_t TRUNK_OPEN;   // 行李箱开 [0|1]
+    uint8_t COUNTER;      // 计数器 [0|3]
+    uint8_t CHECKSUM;     // 校验和 [0|15]
 } DOORS_STATUS;
 
+// ID: 1302 - ODOMETER 里程表
 typedef struct
 {
-    uint8_t GEAR_SHIFTER; // 5|6@0+ (1,0) [0|63] "" EON
-} GEARBOX;
+    uint32_t ODOMETER; // 里程 [0|16777215] km
+    uint8_t COUNTER;   // 计数器 [0|3]
+    uint8_t CHECKSUM;  // 校验和 [0|3]
+} ODOMETER;
+
+// ID: 401 - GEARBOX_CVT CVT变速箱
+typedef struct
+{
+    uint8_t SELECTED_P;           // P档选择 [0|1]
+    uint8_t SELECTED_R;           // R档选择 [0|1]
+    uint8_t SELECTED_N;           // N档选择 [0|1]
+    uint8_t SELECTED_D;           // D档选择 [0|1]
+    uint8_t FORWARD_DRIVING_MODE; // 前进驾驶模式 [0|1]
+    uint8_t CVT_UNKNOWN_1;        // CVT未知1 [0|255]
+    uint8_t CVT_UNKNOWN_2;        // CVT未知2 [0|255]
+    uint8_t GEAR_SHIFTER;         // 档位选择器 (枚举: 1=P, 2=R, 3=N, 4=D, 7=L, 10=S)
+    uint8_t SHIFTER_POSITION_VALID; // 换档位置有效 [0|1]
+    uint8_t NOT_FORWARD_GEAR;     // 非前进档 [0|1]
+    uint8_t CVT_UNKNOWN_3;        // CVT未知3 [0|3]
+    uint8_t CHECKSUM;             // 校验和 [0|15]
+    uint8_t COUNTER;              // 计数器 [0|3]
+} GEARBOX_CVT;
+
+// ID: 493 - HUD_SETTING HUD设置
+typedef struct
+{
+    uint8_t IMPERIAL_UNIT; // 英制单位 [0|1]
+} HUD_SETTING;
+
+// ID: 804 - CRUISE 定速巡航数据
+typedef struct
+{
+    uint8_t HUD_SPEED_KPH;        // HUD显示的车速（公里/小时）[0|255] "kph"
+    uint8_t HUD_SPEED_MPH;        // HUD显示的车速（英里/小时）[0|255] "mph"
+    uint16_t TRIP_FUEL_CONSUMED;  // 行程燃油消耗 [0|65535] 注意：实际是16位，范围[0|255]可能是注释错误
+    uint8_t CRUISE_SPEED_PCM;     // PCM设置的巡航速度 [0|255] (255表示未设置速度)
+    int8_t BOH2;                  // 未知数据2，有符号 [-128|127] "" 
+    uint8_t BOH3;                 // 未知数据3 [0|255] ""
+    uint8_t COUNTER;              // 计数器 [0|3] ""
+    uint8_t CHECKSUM;             // 校验和 [0|15] ""
+} CRUISE_DATA;
 
 typedef struct
 {
@@ -167,80 +369,9 @@ typedef struct
 
 typedef struct
 {
-    uint8_t WHEELS_MOVING;
-} STANDSTILL;
-
-typedef struct
-{
-    uint8_t EPB_ACTIVE;
-    uint8_t EPB_STATE;
-} EPB_STATUS;
-
-typedef struct
-{
-    float WHEEL_SPEED_FL;    //kph
-    float WHEEL_SPEED_FR;   //kph
-    float WHEEL_SPEED_RL;   //kph
-    float WHEEL_SPEED_RR;   //kph
-} WHEEL_SPEEDS;     //车轮速度数据
-
-typedef struct
-{
-    float LAT_ACCEL;    //m/s^2
-    float LONG_ACCEL;   //m/s^2
-} VEHICLE_DYNAMICS;     //车辆动力学数据
-
-typedef struct
-{
     uint8_t ECON_ON;
 } DRIVE_MODES;
 
-typedef struct
-{
-    uint8_t WHEEL_SPEED_FL;
-    uint8_t WHEEL_SPEED_FR;
-    uint8_t WHEEL_SPEED_RL;
-    uint8_t WHEEL_SPEED_RR;
-} ROUGH_WHEEL_SPEED;
-
-typedef struct
-{
-    uint8_t CRUISE_BUTTONS;
-    uint8_t CRUISE_SETTING;
-} SCM_BUTTONS;
-
-typedef struct
-{
-    uint8_t SEATBELT_DRIVER_LAMP;
-    uint8_t SEATBELT_PASS_UNLATCHED;
-    uint8_t SEATBELT_PASS_LATCHED;
-    uint8_t SEATBELT_DRIVER_UNLATCHED;
-    uint8_t SEATBELT_DRIVER_LATCHED;
-    uint8_t PASS_AIRBAG_OFF;
-    uint8_t PASS_AIRBAG_ON;
-} SEATBELT_STATUS;
-
-typedef struct
-{
-    float ROUGH_CAR_SPEED_3;
-    // uint8_t LOCK_STATUS;
-    // uint8_t IMPERIAL_UNIT;
-} CAR_SPEED;
-
-typedef struct
-{
-    uint8_t DASHBOARD_ALERT;
-    uint8_t AUTO_HEADLIGHTS;
-    uint8_t HIGH_BEAM_HOLD;
-    uint8_t HIGH_BEAM_FLASH;
-    uint8_t HEADLIGHTS_ON;
-    uint8_t WIPER_SWITCH;
-} STALK_STATUS;
-
-typedef struct
-{
-    uint8_t WIPERS;
-    uint8_t LOW_BEAMS;
-    uint8_t HIGH_BEAMS;
-    uint8_t PARK_LIGHTS;
-} STALK_STATUS_2;
+typedef struct {
+    uint8_t GEAR_SHIFTER;           // 5|6@0+ (1,0) [0|63] "" EON
+} GEARBOX;  

@@ -273,20 +273,24 @@ void update_dashboard() {
   
     // 获取车辆数据
     uint16_t rpm = CAN.Powertrain.ENGINE_RPM;
-    float speed = CAN.CarSpeed.ROUGH_CAR_SPEED_3;
-    uint8_t gear = CAN.Gearbox.GEAR_SHIFTER;
+    float speed = CAN.EngineData.XMISSION_SPEED;
+    uint8_t gear = CAN.GearboxCvt.GEAR_SHIFTER;
     
     // 获取传感器数据
     uint8_t engine_temp = CAN.EngineDataThree.ENGINE_TEMP;
     uint8_t intake_temp = CAN.EngineDataThree.INTAKE_TEMP;
     float fuel_consumed = CAN.EngineDataThree.TRIP_FUEL_CONSUMED;
-    float transmission_speed = CAN.EngineData.XMISSION_SPEED;
-    uint8_t trip_distance = CAN.EngineData.ODOMETER;    // 里程m
+
+    float transmission_speed = CAN.EngineData.XMISSION_SPEED2;
+    uint8_t trip_distance = CAN.Odometer.ODOMETER;    // 里程10m
     bool door_fl = CAN.DoorsStatus.DOOR_OPEN_FL;
     bool door_fr = CAN.DoorsStatus.DOOR_OPEN_FR;
     bool door_rl = CAN.DoorsStatus.DOOR_OPEN_RL;
     bool door_rr = CAN.DoorsStatus.DOOR_OPEN_RR;
     bool trunk  =  CAN.DoorsStatus.TRUNK_OPEN;
+
+    float lat_acc = CAN.KinematicsAlt.LAT_ACCEL;
+    float long_acc = CAN.KinematicsAlt.LONG_ACCEL;
     
     // 更新转速显示
     if(label_rpm) {
@@ -328,11 +332,8 @@ void update_dashboard() {
         lv_obj_set_style_text_color(label_gear, gear_color, 0);
     }
     
-    // 更新加速度显示（这里需要从CAN获取实际数据）
+    // 更新加速度显示
     if(label_acc_lat && label_acc_long) {
-        // 暂时使用示例数据
-        static float lat_acc = 0.0f;
-        static float long_acc = 0.1f;
         
         char lat_buf[16], long_buf[16];
         sprintf(lat_buf, "%.2f m/s²", lat_acc);
@@ -369,7 +370,7 @@ void update_dashboard() {
     
     if(label_trip_distance) {
         char buf[16];
-        sprintf(buf, "%d km", trip_distance);
+        sprintf(buf, "%.1f km", trip_distance/100);
         lv_label_set_text(label_trip_distance, buf);
     }
     
@@ -378,8 +379,8 @@ void update_dashboard() {
     
     // 串口输出调试信息（每秒一次）
 
-        // Serial.printf("RPM: %d, Speed: %.1f, Gear: %d, Engine: %d°C, Intake: %d°C, Fuel: %.2fL\n",
-        //   rpm, speed, gear, engine_temp, intake_temp, fuel_consumed);
+        Serial.printf("水温: %d°C, 进气: %d°C, 油耗: %.2fL HUD1: %dkph, hud2: %d mph, trip %d\n",
+          engine_temp, intake_temp, fuel_consumed, CAN.CruiseData.HUD_SPEED_KPH,CAN.CruiseData.HUD_SPEED_MPH,CAN.CruiseData.TRIP_FUEL_CONSUMED);
     
     last_update = now;
 }
