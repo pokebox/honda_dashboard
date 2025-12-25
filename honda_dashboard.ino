@@ -3,7 +3,49 @@
 #include "lv_conf.h"
 #include "SPI.h"
 
+#define USE_BROADCAST
 //#define USE_BLE
+
+#ifdef USE_BROADCAST
+#include "ESP32_NOW.h"
+#include "WiFi.h"
+
+#include <esp_mac.h>  // For the MAC2STR and MACSTR macros
+
+#define ESPNOW_WIFI_CHANNEL 6
+
+class ESP_NOW_Broadcast_Peer : public ESP_NOW_Peer {
+public:
+  // Constructor of the class using the broadcast address
+  ESP_NOW_Broadcast_Peer(uint8_t channel, wifi_interface_t iface, const uint8_t *lmk) : ESP_NOW_Peer(ESP_NOW.BROADCAST_ADDR, channel, iface, lmk) {}
+
+  // Destructor of the class
+  ~ESP_NOW_Broadcast_Peer() {
+    remove();
+  }
+
+  // Function to properly initialize the ESP-NOW and register the broadcast peer
+  bool begin() {
+    if (!ESP_NOW.begin() || !add()) {
+      log_e("Failed to initialize ESP-NOW or register the broadcast peer");
+      return false;
+    }
+    return true;
+  }
+
+  // Function to send a message to all devices within the network
+  bool send_message(const uint8_t *data, size_t len) {
+    if (!send(data, len)) {
+      log_e("Failed to broadcast message");
+      return false;
+    }
+    return true;
+  }
+};
+ESP_NOW_Broadcast_Peer broadcast_peer(ESPNOW_WIFI_CHANNEL, WIFI_IF_STA, NULL);
+
+#endif
+
 #ifdef USE_BLE
 #include <BLEServer.h>
 #include <BLEDevice.h>
@@ -297,6 +339,21 @@ void setup() {
     digitalWrite(TFT_LED, HIGH);
     pinMode(BTN_PIN, INPUT_PULLUP);
 
+    #ifdef USE_BROADCAST
+        WiFi.mode(WIFI_STA);
+        WiFi.setChannel(ESPNOW_WIFI_CHANNEL);
+        while (!WiFi.STA.started()) {
+            delay(100);
+        }
+        // Register the broadcast peer
+        if (!broadcast_peer.begin()) {
+            Serial.println("Failed to initialize broadcast peer");
+            Serial.println("Reebooting in 5 seconds...");
+            // delay(5000);
+            ESP.restart();
+        }
+    #endif
+
     #ifdef USE_BLE
         configBLE();
     #endif
@@ -489,7 +546,14 @@ void canTask(void *arg)
     while (1)
     {
         CAN.run();
+#ifdef USE_BROADCAST
+        char data[16];
+        snprintf(data, sizeof(data), "%d rpm", CAN.Powertrain.ENGINE_RPM);
+        if (!broadcast_peer.send_message((uint8_t *)data, sizeof(data))) {
+            Serial.println("Failed to broadcast message");
+        }
         vTaskDelay(pdMS_TO_TICKS(1));
+#endif
     }
 }
 
@@ -515,8 +579,6 @@ void loop() {
         lv_obj_invalidate(lv_scr_act());
         lv_refr_now(primary_disp);
     }
-    // 处理CAN消息
-    // CAN.run();
     // 更新仪表盘显示
     update_dashboard();
     // 处理LVGL任务
