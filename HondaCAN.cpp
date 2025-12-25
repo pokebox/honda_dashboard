@@ -502,6 +502,20 @@ float HondaCAN::obd2Request(uint8_t pid)
   return result;
 }
 
+String HondaCAN::obd2RequestVIN()
+{
+  String result = "";
+  this->obd2_send(read_VehicleInfo, read_VIN);
+  if (this->obd2_receive())
+  {
+    for (int i = 0; i < obdResponse.data_length_code - 2; i++)
+    {
+      result += (char)obdResponse.data[i + 2];
+    }
+  }
+  return result;
+}
+
 // void HondaCAN::checkDTC() {
 // uint8_t supportedLiveData[32];
 // uint8_t supportedFreezeFrame[32];

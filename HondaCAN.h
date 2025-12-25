@@ -11,6 +11,7 @@ public:
     bool begin();
     void run();
     float obd2Request(uint8_t pid);
+    String obd2RequestVIN();    // 请求VIN
     
     int LED_EN = 13;        // LED使能引脚
     int RX_PIN = 2;         // CAN接收引脚

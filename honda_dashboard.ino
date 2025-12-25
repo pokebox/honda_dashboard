@@ -36,11 +36,15 @@ static lv_disp_t * primary_disp = NULL; // 保存主显示对象
 #define COLOR_DOOR_CLOSED lv_color_hex(0x55ff55)   // 绿色（门关）
 
 // 全局标签指针
+lv_obj_t* title_label;
 lv_obj_t* label_rpm;
+lv_obj_t* label_gas;
 lv_obj_t* label_brake;
 lv_obj_t* label_speed;
 lv_obj_t* label_acc_lat;
 lv_obj_t* label_acc_long;
+lv_obj_t* label_g_lat;
+lv_obj_t* label_g_long;
 
 // 门状态标签
 lv_obj_t* label_doors[5];  // 0:驾驶门, 1:副驾门, 2:左后门, 3:右后门, 4:后备箱
@@ -50,7 +54,7 @@ lv_obj_t* door_labels[5];  // 对应的门标签
 lv_obj_t* label_engine_temp;
 lv_obj_t* label_intake_temp;
 lv_obj_t* label_fuel_consumed;
-lv_obj_t* label_transmission_speed;
+lv_obj_t* label_steer_ang;
 lv_obj_t* label_trip_distance;
 
 /* Display flushing */
@@ -173,11 +177,11 @@ void create_dashboard() {
     lv_obj_t* scr = lv_scr_act();
     
     // 设置屏幕背景色
-    lv_obj_set_style_bg_color(scr, COLOR_BACKGROUND, 0);
+    lv_obj_set_style_bg_color(scr, lv_color_hex(0), 0);
     lv_obj_set_style_bg_opa(scr, LV_OPA_COVER, 0);
     
     // 创建标题 - 顶部居中
-    lv_obj_t* title_label = lv_label_create(scr);
+    title_label = lv_label_create(scr);
     lv_label_set_text(title_label, "Honda 车辆状态监控");
     lv_obj_set_style_text_color(title_label, COLOR_ACCENT, 0);
     lv_obj_set_style_text_font(title_label, &dengxian_14, 0);
@@ -185,14 +189,16 @@ void create_dashboard() {
     
     // 第一行：主要驾驶信息 - 使用网格布局
     // 3列：转速 | 车速 | 档位
-    label_rpm = create_label_group(scr, "发动机转速", "0", 20, 30, 140, 60);
-    label_speed = create_label_group(scr, "车速", "0 km/h", 170, 30, 140, 60);
-    label_brake = create_label_group(scr, "刹车力度", "-", 320, 30, 140, 60);
+    label_rpm =   create_label_group(scr, "发动机转速", "0", 20, 30, 100, 60);
+    label_speed = create_label_group(scr, "车速", "0 km/h", 130, 30, 100, 60);
+    label_gas =   create_label_group(scr, "油门", "0 %",    240, 30, 100, 60);
+    label_brake = create_label_group(scr, "刹车力度", "-",  360, 30, 100, 60);
     
     // 第二行：加速度信息 - 使用2列布局
-    label_acc_lat = create_label_group(scr, "横向加速度", "0.00 m/s²", 20, 100, 220, 50);
-    label_acc_long = create_label_group(scr, "纵向加速度", "0.00 m/s²", 250, 100, 210, 50);
-
+    label_acc_lat =  create_label_group(scr, "横向加速度", "0.00 m/s²",  20, 100, 100, 50);
+    label_acc_long = create_label_group(scr, "纵向加速度", "0.00 m/s²", 130, 100, 100, 50);
+    label_g_lat =    create_label_group(scr, "横向G值", "0.00 g",       240, 100, 100, 50);
+    label_g_long =   create_label_group(scr, "纵向G值", "0.00 g",       360, 100, 100, 50);
     // 第三行：5个门状态全部放在同一行
     // 更新create_door_indicators函数调用，传递起始位置
     create_door_indicators(scr, 10, 160);
@@ -203,8 +209,8 @@ void create_dashboard() {
     label_fuel_consumed = create_label_group(scr, "油耗", "-- L", 320, 220, 140, 45);
 
     // 第五行：其他信息 - 使用2列布局
-    label_transmission_speed = create_label_group(scr, "变速箱速度", "-- km/h", 20, 275, 220, 45);
-    label_trip_distance = create_label_group(scr, "本次里程", "-- km", 250, 275, 210, 45);
+    label_steer_ang = create_label_group(scr, "转向角度", "-- °", 20, 275, 220, 45);
+    label_trip_distance = create_label_group(scr, "里程", "-- km", 250, 275, 210, 45);
 
 }
 
@@ -265,6 +271,10 @@ void setup() {
     // 创建仪表盘界面
     create_dashboard();
     Serial.println("系统启动完成!");
+    String car_vin = CAN.obd2RequestVIN();
+    Serial.printf("车辆VIN: %s\n", car_vin.c_str());
+    String title = "Honda 车辆状态监控 - " + car_vin;
+    lv_label_set_text(title_label, title.c_str());
 }
 
 void update_dashboard() {
@@ -311,6 +321,12 @@ void update_dashboard() {
         lv_label_set_text(label_speed, buf);
     }
     
+    if (label_gas) {
+        char buf[16];
+        sprintf(buf, "%d %%", map(CAN.GasPedal2.CAR_GAS, 0, 255, 0, 100));
+        lv_label_set_text(label_gas, buf);
+    }
+
     if(label_brake) {
         char brake_text[16];
         sprintf(brake_text, "%.1f", CAN.VsaStatus.USER_BRAKE);
@@ -320,12 +336,16 @@ void update_dashboard() {
     // 更新加速度显示
     if(label_acc_lat && label_acc_long) {
         
-        char lat_buf[16], long_buf[16];
+        char lat_buf[16], long_buf[16], g_x[16], g_y[16];
         sprintf(lat_buf, "%.2f m/s²", lat_acc);
         sprintf(long_buf, "%.2f m/s²", long_acc);
+        sprintf(g_x, "%.2f g", lat_acc / 9.81f);
+        sprintf(g_y, "%.2f g", long_acc / 9.81f);
         
         lv_label_set_text(label_acc_lat, lat_buf);
         lv_label_set_text(label_acc_long, long_buf);
+        lv_label_set_text(label_g_lat, g_x);
+        lv_label_set_text(label_g_long, g_y);
     }
     
     // 更新传感器数据显示
@@ -347,10 +367,10 @@ void update_dashboard() {
         lv_label_set_text(label_fuel_consumed, buf);
     }
     
-    if(label_transmission_speed) {
+    if(label_steer_ang) {
         char buf[16];
-        sprintf(buf, "%.1f km/h", transmission_speed);
-        lv_label_set_text(label_transmission_speed, buf);
+        sprintf(buf, "%.1f °", CAN.SteeringSensors.STEER_ANGLE);
+        lv_label_set_text(label_steer_ang, buf);
     }
     
     if(label_trip_distance) {
