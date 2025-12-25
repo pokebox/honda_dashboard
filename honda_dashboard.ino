@@ -324,6 +324,16 @@ void setup() {
     primary_disp = lv_disp_drv_register(&disp_drv);
     Serial.println("显示驱动注册完成");
 
+    xTaskCreatePinnedToCore(
+        canTask,          // 任务函数
+        "CAN_Task",       // 任务名称
+        4096,             // 堆栈大小
+        NULL,             // 任务参数
+        1,                // 优先级（1-24，数值越大优先级越高）
+        NULL,             // 任务句柄
+        0                 // 运行在Core 0
+    );
+    Serial.println("CAN任务创建到Core 0");
     // 创建仪表盘界面
     create_dashboard();
     Serial.println("系统启动完成!");
@@ -473,6 +483,16 @@ void update_dashboard() {
     last_update = now;
 }
 
+void canTask(void *arg)
+{
+    Serial.println("CAN任务启动，运行在Core " + String(xPortGetCoreID()));
+    while (1)
+    {
+        CAN.run();
+        vTaskDelay(pdMS_TO_TICKS(1));
+    }
+}
+
 void loop() {
     static uint32_t last_tick = 0;
     uint32_t now = millis();
@@ -496,7 +516,7 @@ void loop() {
         lv_refr_now(primary_disp);
     }
     // 处理CAN消息
-    CAN.run();
+    // CAN.run();
     // 更新仪表盘显示
     update_dashboard();
     // 处理LVGL任务
