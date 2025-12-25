@@ -10,6 +10,9 @@
 #define TFT_MISO 9
 #define TFT_CLK 12
 #define TFT_LED 45
+#define BTN_PIN 0
+
+#define SPI_FREQUENCY 35000000
 
 #include <Arduino_GFX_Library.h>
 Arduino_DataBus *bus = new Arduino_HWSPI(TFT_DC, TFT_CS, TFT_CLK, TFT_MOSI, TFT_MISO);
@@ -22,7 +25,7 @@ static const uint16_t screenHeight = 320;
 
 static lv_disp_draw_buf_t draw_buf;
 static lv_color_t buf[screenWidth * screenHeight / 10];
-
+static lv_disp_t * primary_disp = NULL; // 保存主显示对象
 
 // 颜色定义
 #define COLOR_BACKGROUND lv_color_hex(0x1a1a2e)    // 深蓝背景
@@ -232,9 +235,11 @@ void setup() {
     // TFT背光
     pinMode(TFT_LED, OUTPUT);
     digitalWrite(TFT_LED, HIGH);
+    pinMode(BTN_PIN, INPUT_PULLUP);
+
 
     // 初始化显示屏
-    tft->begin();
+    tft->begin(SPI_FREQUENCY);
     tft->fillScreen(BLACK);
     tft->setRotation(1);
     Serial.println("显示屏初始化完成");
@@ -254,7 +259,7 @@ void setup() {
     disp_drv.ver_res = screenHeight;
     disp_drv.flush_cb = my_disp_flush;
     disp_drv.draw_buf = &draw_buf;
-    lv_disp_drv_register(&disp_drv);
+    primary_disp = lv_disp_drv_register(&disp_drv);
     Serial.println("显示驱动注册完成");
 
     // 创建仪表盘界面
@@ -400,7 +405,20 @@ void loop() {
         lv_tick_inc(5);
         last_tick = now;
     }
-
+    if (digitalRead(BTN_PIN) == LOW)
+    {
+        // 按下按钮，切换屏幕方向
+        if (tft->getRotation() == 1)
+        {
+            tft->setRotation(3);
+        }
+        else
+        {
+            tft->setRotation(1);
+        }
+        lv_obj_invalidate(lv_scr_act());
+        lv_refr_now(primary_disp);
+    }
     // 处理CAN消息
     CAN.run();
     // 更新仪表盘显示
