@@ -84,7 +84,7 @@ typedef enum
 
 // ================== 结构体定义 ==================
 
-// ID: 380 - POWERTRAIN_DATA 动力总成数据
+// ID: 380 - POWERTRAIN_DATA 动力总成数据 20Hz
 typedef struct
 {
     uint8_t PEDAL_GAS;     // 油门踏板 [0|255]
@@ -96,32 +96,26 @@ typedef struct
     uint16_t BOH2_17C;     // 位47-56 (10 bits)
     uint8_t BRAKE_PRESSED; // 刹车是否被按下 [0|1]
     uint8_t BOH3_17C;      // 位52-56 (5 bits)
-    uint8_t COUNTER;       // 计数器 [0|3]
-    uint8_t CHECKSUM;      // 校验和 [0|15]
 } POWERTRAIN_DATA;
 
-// ID: 344 - ENGINE_DATA 发动机数据
+// ID: 344 - ENGINE_DATA 发动机数据 20Hz
 typedef struct
 {
     float XMISSION_SPEED;  // 变速箱速度 (kph)
     uint16_t ENGINE_RPM;   // 发动机转速 [0|15000] rpm
     float XMISSION_SPEED2; // 变速箱速度2 (kph)
     uint16_t ODOMETER;     // 里程表 (单位: 10米)
-    uint8_t COUNTER;       // 计数器 [0|3]
-    uint8_t CHECKSUM;      // 校验和 [0|15]
 } ENGINE_DATA;
 
-// ID: 304 - GAS_PEDAL_2 油门踏板数据2
+// ID: 304 - GAS_PEDAL_2 油门踏板数据2 20Hz
 typedef struct
 {
     int16_t ENGINE_TORQUE_ESTIMATE; // 发动机扭矩估计 [-1000|1000] Nm
     int16_t ENGINE_TORQUE_REQUEST;  // 发动机扭矩请求 [-1000|1000] Nm
     uint8_t CAR_GAS;                // 油门踏板 [0|255]
-    uint8_t COUNTER;                // 计数器 [0|3]
-    uint8_t CHECKSUM;               // 校验和 [0|15]
 } GAS_PEDAL_2;
 
-// ID: 330 - STEERING_SENSORS 转向传感器数据
+// ID: 330 - STEERING_SENSORS 转向传感器数据 20Hz
 typedef struct
 {
     float STEER_ANGLE;          // 转向角度 [-500|500] deg
@@ -130,20 +124,16 @@ typedef struct
     uint8_t STEER_SENSOR_STATUS_2; // 转向传感器状态2 [0|1]
     uint8_t STEER_SENSOR_STATUS_3; // 转向传感器状态3 [0|1]
     float STEER_WHEEL_ANGLE;    // 转向盘角度 [-500|500] deg
-    uint8_t COUNTER;            // 计数器 [0|3]
-    uint8_t CHECKSUM;           // 校验和 [0|15]
 } STEERING_SENSORS;
 
-// ID: 148 - KINEMATICS_ALT 运动学数据（替代）
+// ID: 148 - KINEMATICS_ALT 运动学数据（替代） 20Hz
 typedef struct
 {
     float LAT_ACCEL;    // 横向加速度 [-20|20] m/s²
     float LONG_ACCEL;   // 纵向加速度 [-20|20] m/s²
-    uint8_t CHECKSUM;   // 校验和 [0|3]
-    uint8_t COUNTER;    // 计数器 [0|3]
 } KINEMATICS_ALT;
 
-// ID: 420 - VSA_STATUS 车辆稳定性控制系统状态
+// ID: 420 - VSA_STATUS 车辆稳定性控制系统状态 10Hz
 typedef struct
 {
     float USER_BRAKE;         // 用户刹车 [0|1000] (单位: 0.015625, 偏移: -1.609375)
@@ -152,70 +142,57 @@ typedef struct
     uint8_t BRAKE_HOLD_RELATED; // 刹车保持相关 [0|1]
     uint8_t BRAKE_HOLD_ACTIVE;  // 刹车保持激活 [0|1]
     uint8_t BRAKE_HOLD_ENABLED; // 刹车保持启用 [0|1]
-    uint8_t COUNTER;           // 计数器 [0|3]
-    uint8_t CHECKSUM;          // 校验和 [0|15]
 } VSA_STATUS;
 
-// ID: 432 - STANDSTILL 静止状态
+// ID: 432 - STANDSTILL 静止状态 10Hz
 typedef struct
 {
     uint8_t CONTROLLED_STANDSTILL; // 受控静止 [0|1]
     uint8_t WHEELS_MOVING;         // 车轮移动 [0|1]
     uint8_t BRAKE_ERROR_1;         // 刹车错误1 [0|1]
     uint8_t BRAKE_ERROR_2;         // 刹车错误2 [0|1]
-    uint8_t COUNTER;               // 计数器 [0|3]
-    uint8_t CHECKSUM;              // 校验和 [0|3]
 } STANDSTILL;
 
-// ID: 464 - WHEEL_SPEEDS 车轮速度
+// ID: 464 - WHEEL_SPEEDS 车轮速度 10Hz
 typedef struct
 {
     float WHEEL_SPEED_FL; // 左前轮速度 [0|250] kph
     float WHEEL_SPEED_FR; // 右前轮速度 [0|250] kph
     float WHEEL_SPEED_RL; // 左后轮速度 [0|250] kph
     float WHEEL_SPEED_RR; // 右后轮速度 [0|250] kph
-    uint8_t CHECKSUM;     // 校验和 [0|3]
 } WHEEL_SPEEDS;
 
-// ID: 490 - VEHICLE_DYNAMICS 车辆动力学数据
+// ID: 490 - VEHICLE_DYNAMICS 车辆动力学数据 10Hz
 typedef struct
 {
     float LAT_ACCEL;  // 横向加速度 [-20|20] m/s²
     float LONG_ACCEL; // 纵向加速度 [-20|20] m/s²
-    uint8_t COUNTER;  // 计数器 [0|3]
-    uint8_t CHECKSUM; // 校验和 [0|3]
 } VEHICLE_DYNAMICS;
 
-// ID: 427 - STEER_MOTOR_TORQUE 转向电机扭矩
+// ID: 427 - STEER_MOTOR_TORQUE 转向电机扭矩 10Hz
 typedef struct
 {
     uint8_t CONFIG_VALID;    // 配置有效 [0|1]
     uint16_t MOTOR_TORQUE;   // 电机扭矩 [0|256]
     uint8_t OUTPUT_DISABLED; // 输出禁用 [0|1]
-    uint8_t COUNTER;         // 计数器 [0|3]
-    uint8_t CHECKSUM;        // 校验和 [0|15]
 } STEER_MOTOR_TORQUE;
 
-// ID: 450 - EPB_STATUS 电子驻车制动状态
+// ID: 450 - EPB_STATUS 电子驻车制动状态 10Hz
 typedef struct
 {
     uint8_t EPB_BRAKE_AND_PULL; // EPB刹车和拉动 [0|1]
     uint8_t EPB_ACTIVE;         // EPB激活 [0|1]
     uint8_t EPB_STATE;          // EPB状态 (枚举: 0=disengaged, 1=engaging, 2=disengaging, 3=engaged)
-    uint8_t CHECKSUM;           // 校验和 [0|15]
-    uint8_t COUNTER;            // 计数器 [0|3]
 } EPB_STATUS;
 
-// ID: 545 - ECON_STATUS 经济模式状态
+// ID: 545 - ECON_STATUS 经济模式状态 5Hz
 typedef struct
 {
     uint8_t ECON_ON_2;  // 经济模式2 [0|3]
     uint8_t ECON_ON;    // 经济模式 [0|1]
-    uint8_t CHECKSUM;   // 校验和 [0|3]
-    uint8_t COUNTER;    // 计数器 [0|3]
 } ECON_STATUS;
 
-// ID: 597 - ROUGH_WHEEL_SPEED 粗略车轮速度
+// ID: 597 - ROUGH_WHEEL_SPEED 粗略车轮速度 5Hz
 typedef struct
 {
     uint8_t WHEEL_SPEED_FL; // 左前轮速度 [0|255] kph
@@ -225,34 +202,28 @@ typedef struct
     uint8_t SET_TO_X55;     // 设置为0x55 [0|255]
     uint8_t SET_TO_X55_2;   // 设置为0x55_2 [0|255]
     uint8_t LONG_COUNTER;   // 长计数器 [0|255]
-    uint8_t CHECKSUM;       // 校验和 [0|15]
-    uint8_t COUNTER;        // 计数器 [0|3]
 } ROUGH_WHEEL_SPEED;
 
-// ID: 662 - SCM_BUTTONS 方向盘控制按钮
+// ID: 662 - SCM_BUTTONS 方向盘控制按钮 5Hz
 typedef struct
 {
     uint8_t CRUISE_BUTTONS; // 巡航按钮 (枚举: 0=none, 1=main, 2=cancel, 3=decel_set, 4=accel_res)
     uint8_t CRUISE_SETTING; // 巡航设置 [0|3]
-    uint8_t CHECKSUM;       // 校验和 [0|3]
-    uint8_t COUNTER;        // 计数器 [0|3]
 } SCM_BUTTONS;
 
-// ID: 773 - SEATBELT_STATUS 安全带状态
+// ID: 773 - SEATBELT_STATUS 安全带状态 2.5Hz
 typedef struct
 {
-    uint8_t SEATBELT_DRIVER_LAMP;      // 驾驶员安全带灯 [0|1]
-    uint8_t SEATBELT_PASS_UNLATCHED;   // 乘客安全带未锁 [0|1]
-    uint8_t SEATBELT_PASS_LATCHED;     // 乘客安全带已锁 [0|1]
-    uint8_t SEATBELT_DRIVER_UNLATCHED; // 驾驶员安全带未锁 [0|1]
-    uint8_t SEATBELT_DRIVER_LATCHED;   // 驾驶员安全带已锁 [0|1]
-    uint8_t PASS_AIRBAG_OFF;           // 乘客安全气囊关闭 [0|1]
-    uint8_t PASS_AIRBAG_ON;            // 乘客安全气囊开启 [0|1]
-    uint8_t COUNTER;                   // 计数器 [0|3]
-    uint8_t CHECKSUM;                  // 校验和 [0|3]
+    bool SEATBELT_DRIVER_LAMP;      // 驾驶员安全带灯 [0|1]
+    bool SEATBELT_PASS_UNLATCHED;   // 乘客安全带未锁 [0|1]
+    bool SEATBELT_PASS_LATCHED;     // 乘客安全带已锁 [0|1]
+    bool SEATBELT_DRIVER_UNLATCHED; // 驾驶员安全带未锁 [0|1]
+    bool SEATBELT_DRIVER_LATCHED;   // 驾驶员安全带已锁 [0|1]
+    bool PASS_AIRBAG_OFF;           // 乘客安全气囊关闭 [0|1]
+    bool PASS_AIRBAG_ON;            // 乘客安全气囊开启 [0|1]
 } SEATBELT_STATUS;
 
-// ID: 777 - CAR_SPEED 车速
+// ID: 777 - CAR_SPEED 车速 2.5Hz
 typedef struct
 {
     uint8_t ROUGH_CAR_SPEED;     // 粗略车速 [0|255] mph
@@ -260,26 +231,23 @@ typedef struct
     float ROUGH_CAR_SPEED_3;     // 粗略车速3 [0|65535] kph
     uint8_t ROUGH_CAR_SPEED_2;   // 粗略车速2 [0|255] mph
     uint8_t LOCK_STATUS;         // 锁定状态 [0|255]
-    uint8_t COUNTER;             // 计数器 [0|3]
-    uint8_t CHECKSUM;            // 校验和 [0|15]
     uint8_t IMPERIAL_UNIT;       // 英制单位 [0|1]
 } CAR_SPEED;
 
-// ID: 806 - SCM_FEEDBACK 方向盘控制反馈
+// ID: 806 - SCM_FEEDBACK 方向盘控制反馈 2.5Hz
 typedef struct
 {
-    uint8_t DRIVERS_DOOR_OPEN; // 驾驶员门开 [0|1]
-    uint8_t REVERSE_LIGHT;     // 倒车灯 [0|1]
+    bool DRIVERS_DOOR_OPEN; // 驾驶员门开 [0|1]
+    bool REVERSE_LIGHT;     // 倒车灯 [0|1]
     uint8_t CMBS_BUTTON;       // CMBS按钮 (枚举: 0=released, 3=pressed)
-    uint8_t LEFT_BLINKER;      // 左转向灯 [0|1]
-    uint8_t RIGHT_BLINKER;     // 右转向灯 [0|1]
-    uint8_t MAIN_ON;           // 主开关开启 [0|1]
-    uint8_t PARKING_BRAKE_ON;  // 驻车制动开启 [0|1]
-    uint8_t COUNTER;           // 计数器 [0|3]
-    uint8_t CHECKSUM;          // 校验和 [0|15]
+    bool LEFT_BLINKER;      // 左转向灯 [0|1]
+    bool RIGHT_BLINKER;     // 右转向灯 [0|1]
+    bool MAIN_ON;           // 主开关开启 [0|1]
+    bool PARKING_BRAKE_ON;  // 驻车制动开启 [0|1]
+
 } SCM_FEEDBACK;
 
-// ID: 884 - STALK_STATUS 拨杆状态
+// ID: 884 - STALK_STATUS 拨杆状态 2.5Hz
 typedef struct
 {
     uint8_t DASHBOARD_ALERT;  // 仪表盘警报 [0|255]
@@ -288,39 +256,32 @@ typedef struct
     uint8_t HIGH_BEAM_FLASH;  // 远光闪烁 [0|1]
     uint8_t HEADLIGHTS_ON;    // 头灯开启 [0|1]
     uint8_t WIPER_SWITCH;     // 雨刷开关 [0|3]
-    uint8_t COUNTER;          // 计数器 [0|3]
-    uint8_t CHECKSUM;         // 校验和 [0|15]
+
 } STALK_STATUS;
 
-// ID: 891 - STALK_STATUS_2 拨杆状态2
+// ID: 891 - STALK_STATUS_2 拨杆状态2 2.5Hz
 typedef struct
 {
     uint8_t WIPERS;       // 雨刷状态 (枚举: 0=Off, 2=Low, 4=High)
-    uint8_t LOW_BEAMS;    // 近光灯 [0|1]
-    uint8_t HIGH_BEAMS;   // 远光灯 [0|1]
-    uint8_t PARK_LIGHTS;  // 停车灯 [0|1]
-    uint8_t COUNTER;      // 计数器 [0|3]
-    uint8_t CHECKSUM;     // 校验和 [0|15]
+    bool LOW_BEAMS;    // 近光灯 [0|1]
+    bool HIGH_BEAMS;   // 远光灯 [0|1]
+    bool PARK_LIGHTS;  // 停车灯 [0|1]
 } STALK_STATUS_2;
 
-// ID: 1029 - DOORS_STATUS 车门状态
+// ID: 1029 - DOORS_STATUS 车门状态 1Hz
 typedef struct
 {
-    uint8_t DOOR_OPEN_FL; // 左前门开 [0|1]
-    uint8_t DOOR_OPEN_FR; // 右前门开 [0|1]
-    uint8_t DOOR_OPEN_RL; // 左后门开 [0|1]
-    uint8_t DOOR_OPEN_RR; // 右后门开 [0|1]
-    uint8_t TRUNK_OPEN;   // 行李箱开 [0|1]
-    uint8_t COUNTER;      // 计数器 [0|3]
-    uint8_t CHECKSUM;     // 校验和 [0|15]
+    bool DOOR_OPEN_FL; // 左前门开 [0|1]
+    bool DOOR_OPEN_FR; // 右前门开 [0|1]
+    bool DOOR_OPEN_RL; // 左后门开 [0|1]
+    bool DOOR_OPEN_RR; // 右后门开 [0|1]
+    bool TRUNK_OPEN;   // 行李箱开 [0|1]
 } DOORS_STATUS;
 
-// ID: 1302 - ODOMETER 里程表
+// ID: 1302 - ODOMETER 里程表 1Hz
 typedef struct
 {
     uint32_t ODOMETER; // 里程 [0|16777215] km
-    uint8_t COUNTER;   // 计数器 [0|3]
-    uint8_t CHECKSUM;  // 校验和 [0|3]
 } ODOMETER;
 
 // ID: 401 - GEARBOX_CVT CVT变速箱
@@ -337,8 +298,6 @@ typedef struct
     uint8_t SHIFTER_POSITION_VALID; // 换档位置有效 [0|1]
     uint8_t NOT_FORWARD_GEAR;     // 非前进档 [0|1]
     uint8_t CVT_UNKNOWN_3;        // CVT未知3 [0|3]
-    uint8_t CHECKSUM;             // 校验和 [0|15]
-    uint8_t COUNTER;              // 计数器 [0|3]
 } GEARBOX_CVT;
 
 // ID: 493 - HUD_SETTING HUD设置
@@ -356,8 +315,6 @@ typedef struct
     uint8_t CRUISE_SPEED_PCM;     // PCM设置的巡航速度 [0|255] (255表示未设置速度)
     int8_t BOH2;                  // 未知数据2，有符号 [-128|127] "" 
     uint8_t BOH3;                 // 未知数据3 [0|255] ""
-    uint8_t COUNTER;              // 计数器 [0|3] ""
-    uint8_t CHECKSUM;             // 校验和 [0|15] ""
 } CRUISE_DATA;
 
 typedef struct

@@ -34,7 +34,7 @@ static lv_color_t buf[screenWidth * screenHeight / 10];
 
 // 全局标签指针
 lv_obj_t* label_rpm;
-lv_obj_t* label_gear;
+lv_obj_t* label_brake;
 lv_obj_t* label_speed;
 lv_obj_t* label_acc_lat;
 lv_obj_t* label_acc_long;
@@ -184,7 +184,7 @@ void create_dashboard() {
     // 3列：转速 | 车速 | 档位
     label_rpm = create_label_group(scr, "发动机转速", "0", 20, 30, 140, 60);
     label_speed = create_label_group(scr, "车速", "0 km/h", 170, 30, 140, 60);
-    label_gear = create_label_group(scr, "当前档位", "-", 320, 30, 140, 60);
+    label_brake = create_label_group(scr, "刹车力度", "-", 320, 30, 140, 60);
     
     // 第二行：加速度信息 - 使用2列布局
     label_acc_lat = create_label_group(scr, "横向加速度", "0.00 m/s²", 20, 100, 220, 50);
@@ -267,30 +267,30 @@ void update_dashboard() {
     uint32_t now = millis();
     
     // 调整更新频率
-    // if (now - last_update < 20) {
-    //     return;
-    // }
+    if (now - last_update < 10) {
+        return;
+    }
   
     // 获取车辆数据
-    uint16_t rpm = CAN.Powertrain.ENGINE_RPM;
-    float speed = CAN.EngineData.XMISSION_SPEED;
-    uint8_t gear = CAN.GearboxCvt.GEAR_SHIFTER;
+    uint16_t rpm = CAN.Powertrain.ENGINE_RPM;       //转速
+    float speed = CAN.EngineData.XMISSION_SPEED;    //车速
+    uint8_t gear = CAN.GearboxCvt.GEAR_SHIFTER;     //档位
     
     // 获取传感器数据
-    uint8_t engine_temp = CAN.EngineDataThree.ENGINE_TEMP;
-    uint8_t intake_temp = CAN.EngineDataThree.INTAKE_TEMP;
-    float fuel_consumed = CAN.EngineDataThree.TRIP_FUEL_CONSUMED;
+    uint8_t engine_temp = CAN.EngineDataThree.ENGINE_TEMP;      //水温
+    uint8_t intake_temp = CAN.EngineDataThree.INTAKE_TEMP;      //进气温度
+    float fuel_consumed = CAN.EngineDataThree.TRIP_FUEL_CONSUMED;   //油耗
 
-    float transmission_speed = CAN.EngineData.XMISSION_SPEED2;
-    uint8_t trip_distance = CAN.Odometer.ODOMETER;    // 里程10m
+    float transmission_speed = CAN.EngineData.XMISSION_SPEED2;      // 变速箱速度
+    uint32_t trip_distance = CAN.Odometer.ODOMETER;    // 里程
     bool door_fl = CAN.DoorsStatus.DOOR_OPEN_FL;
     bool door_fr = CAN.DoorsStatus.DOOR_OPEN_FR;
     bool door_rl = CAN.DoorsStatus.DOOR_OPEN_RL;
     bool door_rr = CAN.DoorsStatus.DOOR_OPEN_RR;
     bool trunk  =  CAN.DoorsStatus.TRUNK_OPEN;
 
-    float lat_acc = CAN.KinematicsAlt.LAT_ACCEL;
-    float long_acc = CAN.KinematicsAlt.LONG_ACCEL;
+    float lat_acc = CAN.VehicleDynamics.LAT_ACCEL;
+    float long_acc = CAN.VehicleDynamics.LONG_ACCEL;
     
     // 更新转速显示
     if(label_rpm) {
@@ -302,34 +302,14 @@ void update_dashboard() {
     // 更新车速显示
     if(label_speed) {
         char buf[16];
-        sprintf(buf, "%.0f km/h", speed);
+        sprintf(buf, "%.1f km/h", speed);
         lv_label_set_text(label_speed, buf);
     }
     
-    // 更新档位显示
-    if(label_gear) {
-      #ifdef IS_AUTO_GEAR_MODE
-        char gear_char = gear_to_char(gear);
-        char gear_text[4] = {gear_char, '\0'};
-        
-        // 根据档位设置颜色
-        lv_color_t gear_color = COLOR_TEXT_MAIN;
-        switch(gear_char) {
-            case 'R': gear_color = lv_color_hex(0xff5555); break; // 红色
-            case 'N': gear_color = lv_color_hex(0xffff55); break; // 黄色
-            case 'D': gear_color = COLOR_ACCENT; break;          // 绿色
-            case 'S': gear_color = lv_color_hex(0xffaa00); break; // 橙色
-            case 'L': gear_color = lv_color_hex(0x5555ff); break; // 蓝色
-        }
-      #else
-        char gear_text[2];
-        sprintf(gear_text, "%d", gear);
-        lv_color_t gear_color = COLOR_TEXT_MAIN;
-      #endif
-
-        
-        lv_label_set_text(label_gear, gear_text);
-        lv_obj_set_style_text_color(label_gear, gear_color, 0);
+    if(label_brake) {
+        char brake_text[16];
+        sprintf(brake_text, "%.1f", CAN.VsaStatus.USER_BRAKE);
+        lv_label_set_text(label_brake, brake_text);
     }
     
     // 更新加速度显示
@@ -370,7 +350,7 @@ void update_dashboard() {
     
     if(label_trip_distance) {
         char buf[16];
-        sprintf(buf, "%.1f km", trip_distance/100);
+        sprintf(buf, "%d km", trip_distance);
         lv_label_set_text(label_trip_distance, buf);
     }
     
@@ -379,29 +359,55 @@ void update_dashboard() {
     
     // 串口输出调试信息（每秒一次）
 
-        Serial.printf("水温: %d°C, 进气: %d°C, 油耗: %.2fL HUD1: %dkph, hud2: %d mph, trip %d\n",
-          engine_temp, intake_temp, fuel_consumed, CAN.CruiseData.HUD_SPEED_KPH,CAN.CruiseData.HUD_SPEED_MPH,CAN.CruiseData.TRIP_FUEL_CONSUMED);
-    
+    static uint32_t last_uart_update = 0;
+    if (now - last_uart_update >= 100)
+    {
+        // Serial.printf(
+        //     "转向角度: %.1f°, 方向盘角度: %.1f deg, 角速度: %.1f deg, 状态1: %d, %d, %d | 电机扭矩: %d, CFG: %d, EN: %d | 里程：%d\n",
+        //     CAN.SteeringSensors.STEER_ANGLE,
+        //     CAN.SteeringSensors.STEER_WHEEL_ANGLE,
+        //     CAN.SteeringSensors.STEER_ANGLE_RATE,
+        //     CAN.SteeringSensors.STEER_SENSOR_STATUS_1,
+        //     CAN.SteeringSensors.STEER_SENSOR_STATUS_2,
+        //     CAN.SteeringSensors.STEER_SENSOR_STATUS_3,
+
+        //     CAN.SteerMotorTorque.MOTOR_TORQUE,
+        //     CAN.SteerMotorTorque.CONFIG_VALID,
+        //     CAN.SteerMotorTorque.OUTPUT_DISABLED,
+
+        //     CAN.EngineData.ODOMETER
+        //   );
+
+        Serial.printf(
+            "刹车: %.1f, 电脑刹车: %d, ESP禁用: %d, 刹车保持相关: %d, 刹车保持激活: %d, 刹车保持启用: %d\n",
+            CAN.VsaStatus.USER_BRAKE,
+            CAN.VsaStatus.COMPUTER_BRAKING,
+            CAN.VsaStatus.ESP_DISABLED,
+            CAN.VsaStatus.BRAKE_HOLD_RELATED,
+            CAN.VsaStatus.BRAKE_HOLD_ACTIVE,
+            CAN.VsaStatus.BRAKE_HOLD_ENABLED
+        );
+        last_uart_update = now;
+    }
     last_update = now;
 }
 
 void loop() {
-    //static uint32_t last_tick = 0;
-    //uint32_t now = millis();
-    
+    static uint32_t last_tick = 0;
+    uint32_t now = millis();
+    // 更新LVGL tick（每5ms）
+    if (now - last_tick >= 5) {
+        lv_tick_inc(5);
+        last_tick = now;
+    }
+
     // 处理CAN消息
     CAN.run();
-    // 更新LVGL tick（每5ms）
-    // if (now - last_tick >= 5) {
-        lv_tick_inc(1);
-    //     last_tick = now;
-    // }
-    
     // 更新仪表盘显示
     update_dashboard();
-    
     // 处理LVGL任务
+    uint32_t start_time = millis();
     lv_timer_handler();
-    
+    Serial.printf("LVGL任务耗时：%dms\n", millis() - start_time);
     delay(1);
 }

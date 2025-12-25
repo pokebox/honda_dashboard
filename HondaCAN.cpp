@@ -123,8 +123,6 @@ void HondaCAN::parsePowertrainData(uint8_t data[8])
   Powertrain.BOH2_17C |= (data[6] & 0xFF) << 2;
   Powertrain.BRAKE_PRESSED = (data[6] >> 5) & 0x01;
   Powertrain.BOH3_17C = (data[6] >> 0) & 0x1F;
-  Powertrain.COUNTER = (data[7] >> 6) & 0x03;
-  Powertrain.CHECKSUM = (data[7] >> 2) & 0x0F;
 }
 
 // 解析ENGINE_DATA (ID: 344)
@@ -134,8 +132,6 @@ void HondaCAN::parseEngineData(uint8_t data[8])
   EngineData.ENGINE_RPM = ((uint16_t)data[2] << 8) | data[3];
   EngineData.XMISSION_SPEED2 = (((uint16_t)data[4] << 8) | data[5]) * 0.01f;
   EngineData.ODOMETER = data[6] * 10;
-  EngineData.COUNTER = (data[7] >> 6) & 0x03;
-  EngineData.CHECKSUM = (data[7] >> 2) & 0x0F;
 }
 
 // 解析ENGINE_DATA_3 (需要定义ID)
@@ -162,8 +158,6 @@ void HondaCAN::parseVsaStatus(uint8_t data[8])
   VsaStatus.BRAKE_HOLD_RELATED = (data[6] >> 4) & 0x01;
   VsaStatus.BRAKE_HOLD_ACTIVE = (data[5] >> 6) & 0x01;
   VsaStatus.BRAKE_HOLD_ENABLED = (data[5] >> 5) & 0x01;
-  VsaStatus.COUNTER = (data[7] >> 6) & 0x03;
-  VsaStatus.CHECKSUM = (data[7] >> 2) & 0x0F;
 }
 
 // 解析CAR_SPEED (ID: 777)
@@ -174,8 +168,6 @@ void HondaCAN::parseCarSpeed(uint8_t data[8])
   CarSpeed.ROUGH_CAR_SPEED_3 = (((uint16_t)data[4] << 8) | data[5]) * 0.01f;
   CarSpeed.ROUGH_CAR_SPEED_2 = data[3];
   CarSpeed.LOCK_STATUS = (data[6] >> 6) & 0x03;
-  CarSpeed.COUNTER = (data[7] >> 6) & 0x03;
-  CarSpeed.CHECKSUM = (data[7] >> 2) & 0x0F;
   CarSpeed.IMPERIAL_UNIT = (data[7] >> 7) & 0x01;
 }
 
@@ -187,8 +179,6 @@ void HondaCAN::parseDoorsStatus(uint8_t data[8])
   DoorsStatus.DOOR_OPEN_RL = (data[4] >> 7) & 0x01;
   DoorsStatus.DOOR_OPEN_RR = (data[5] >> 0) & 0x01;
   DoorsStatus.TRUNK_OPEN = (data[5] >> 1) & 0x01;
-  DoorsStatus.COUNTER = (data[7] >> 6) & 0x03;
-  DoorsStatus.CHECKSUM = (data[7] >> 2) & 0x0F;
 }
 
 // ================== 新增解析函数实现 ==================
@@ -199,8 +189,6 @@ void HondaCAN::parseGasPedal2(uint8_t data[8])
   GasPedal2.ENGINE_TORQUE_ESTIMATE = (int16_t)((data[0] << 8) | data[1]);
   GasPedal2.ENGINE_TORQUE_REQUEST = (int16_t)((data[2] << 8) | data[3]);
   GasPedal2.CAR_GAS = data[4];
-  GasPedal2.COUNTER = (data[7] >> 6) & 0x03;
-  GasPedal2.CHECKSUM = (data[7] >> 2) & 0x0F;
 }
 
 // 解析STEERING_SENSORS (ID: 330)
@@ -212,8 +200,7 @@ void HondaCAN::parseSteeringSensors(uint8_t data[8])
   SteeringSensors.STEER_SENSOR_STATUS_2 = (data[4] >> 1) & 0x01;
   SteeringSensors.STEER_SENSOR_STATUS_3 = (data[4] >> 0) & 0x01;
   SteeringSensors.STEER_WHEEL_ANGLE = (int16_t)((data[5] << 8) | data[6]) * -0.1f;
-  SteeringSensors.COUNTER = (data[7] >> 6) & 0x03;
-  SteeringSensors.CHECKSUM = (data[7] >> 2) & 0x0F;
+
 }
 
 // 解析KINEMATICS_ALT (ID: 148)
@@ -221,8 +208,7 @@ void HondaCAN::parseKinematicsAlt(uint8_t data[8])
 {
   KinematicsAlt.LAT_ACCEL = (int16_t)((data[0] << 8) | data[1]) * 0.02f - 512.0f;
   KinematicsAlt.LONG_ACCEL = (int16_t)((data[2] << 8) | data[3]) * -0.02f;
-  KinematicsAlt.CHECKSUM = (data[7] >> 2) & 0x0F;
-  KinematicsAlt.COUNTER = (data[7] >> 6) & 0x03;
+
 }
 
 // 解析STANDSTILL (ID: 432)
@@ -232,8 +218,7 @@ void HondaCAN::parseStandstill(uint8_t data[8])
   Standstill.WHEELS_MOVING = (data[1] >> 4) & 0x01;
   Standstill.BRAKE_ERROR_1 = (data[1] >> 3) & 0x01;
   Standstill.BRAKE_ERROR_2 = (data[1] >> 1) & 0x01;
-  Standstill.COUNTER = (data[6] >> 5) & 0x03;
-  Standstill.CHECKSUM = (data[6] >> 1) & 0x0F;
+
 }
 
 // 解析WHEEL_SPEEDS (ID: 464)
@@ -243,7 +228,6 @@ void HondaCAN::parseWheelSpeeds(uint8_t data[8])
   WheelSpeeds.WHEEL_SPEED_FR = ((uint16_t)((data[1] << 7) | (data[2] >> 1)) & 0x7FFF) * 0.01f;
   WheelSpeeds.WHEEL_SPEED_RL = ((uint16_t)((data[3] << 7) | (data[4] >> 1)) & 0x7FFF) * 0.01f;
   WheelSpeeds.WHEEL_SPEED_RR = ((uint16_t)((data[4] << 7) | (data[5] >> 1)) & 0x7FFF) * 0.01f;
-  WheelSpeeds.CHECKSUM = (data[7] >> 2) & 0x0F;
 }
 
 // 解析VEHICLE_DYNAMICS (ID: 490)
@@ -251,8 +235,6 @@ void HondaCAN::parseVehicleDynamics(uint8_t data[8])
 {
   VehicleDynamics.LAT_ACCEL = (int16_t)((data[0] << 8) | data[1]) * 0.0015f;
   VehicleDynamics.LONG_ACCEL = (int16_t)((data[2] << 8) | data[3]) * 0.0015f;
-  VehicleDynamics.COUNTER = (data[7] >> 6) & 0x03;
-  VehicleDynamics.CHECKSUM = (data[7] >> 2) & 0x0F;
 }
 
 // 解析STEER_MOTOR_TORQUE (ID: 427)
@@ -261,8 +243,6 @@ void HondaCAN::parseSteerMotorTorque(uint8_t data[8])
   SteerMotorTorque.CONFIG_VALID = (data[0] >> 7) & 0x01;
   SteerMotorTorque.MOTOR_TORQUE = ((uint16_t)((data[0] << 9) | (data[1] << 1)) & 0x3FF);
   SteerMotorTorque.OUTPUT_DISABLED = (data[2] >> 6) & 0x01;
-  SteerMotorTorque.COUNTER = (data[2] >> 5) & 0x03;
-  SteerMotorTorque.CHECKSUM = (data[2] >> 1) & 0x0F;
 }
 
 // 解析EPB_STATUS (ID: 450)
@@ -271,8 +251,6 @@ void HondaCAN::parseEpbStatus(uint8_t data[8])
   EpbStatus.EPB_BRAKE_AND_PULL = (data[0] >> 6) & 0x01;
   EpbStatus.EPB_ACTIVE = (data[0] >> 3) & 0x01;
   EpbStatus.EPB_STATE = (data[3] >> 5) & 0x03;
-  EpbStatus.CHECKSUM = (data[7] >> 2) & 0x0F;
-  EpbStatus.COUNTER = (data[7] >> 6) & 0x03;
 }
 
 // 解析ECON_STATUS (ID: 545)
@@ -280,8 +258,6 @@ void HondaCAN::parseEconStatus(uint8_t data[8])
 {
   EconStatus.ECON_ON_2 = (data[4] >> 5) & 0x03;
   EconStatus.ECON_ON = (data[2] >> 7) & 0x01;
-  EconStatus.CHECKSUM = (data[5] >> 3) & 0x0F;
-  EconStatus.COUNTER = (data[5] >> 5) & 0x03;
 }
 
 // 解析ROUGH_WHEEL_SPEED (ID: 597)
@@ -294,8 +270,6 @@ void HondaCAN::parseRoughWheelSpeed(uint8_t data[8])
   RoughWheelSpeed.SET_TO_X55 = data[4];
   RoughWheelSpeed.SET_TO_X55_2 = data[5];
   RoughWheelSpeed.LONG_COUNTER = data[6];
-  RoughWheelSpeed.CHECKSUM = (data[7] >> 2) & 0x0F;
-  RoughWheelSpeed.COUNTER = (data[7] >> 6) & 0x03;
 }
 
 // 解析SCM_BUTTONS (ID: 662)
@@ -303,8 +277,6 @@ void HondaCAN::parseScmButtons(uint8_t data[8])
 {
   ScmButtons.CRUISE_BUTTONS = data[0] & 0x07;
   ScmButtons.CRUISE_SETTING = (data[0] >> 3) & 0x03;
-  ScmButtons.CHECKSUM = (data[3] >> 3) & 0x0F;
-  ScmButtons.COUNTER = (data[3] >> 5) & 0x03;
 }
 
 // 解析SEATBELT_STATUS (ID: 773)
@@ -317,8 +289,6 @@ void HondaCAN::parseSeatbeltStatus(uint8_t data[8])
   SeatbeltStatus.SEATBELT_DRIVER_LATCHED = (data[1] >> 5) & 0x01;
   SeatbeltStatus.PASS_AIRBAG_OFF = (data[1] >> 6) & 0x01;
   SeatbeltStatus.PASS_AIRBAG_ON = (data[1] >> 7) & 0x01;
-  SeatbeltStatus.COUNTER = (data[6] >> 5) & 0x03;
-  SeatbeltStatus.CHECKSUM = (data[6] >> 1) & 0x0F;
 }
 
 // 解析SCM_FEEDBACK (ID: 806)
@@ -331,8 +301,6 @@ void HondaCAN::parseScmFeedback(uint8_t data[8])
   ScmFeedback.RIGHT_BLINKER = (data[3] >> 3) & 0x01;
   ScmFeedback.MAIN_ON = (data[3] >> 4) & 0x01;
   ScmFeedback.PARKING_BRAKE_ON = (data[3] >> 5) & 0x01;
-  ScmFeedback.COUNTER = (data[7] >> 6) & 0x03;
-  ScmFeedback.CHECKSUM = (data[7] >> 2) & 0x0F;
 }
 
 // 解析STALK_STATUS (ID: 884)
@@ -344,8 +312,6 @@ void HondaCAN::parseStalkStatus(uint8_t data[8])
   StalkStatus.HIGH_BEAM_FLASH = (data[5] >> 5) & 0x01;
   StalkStatus.HEADLIGHTS_ON = (data[6] >> 6) & 0x01;
   StalkStatus.WIPER_SWITCH = (data[6] >> 5) & 0x03;
-  StalkStatus.COUNTER = (data[7] >> 6) & 0x03;
-  StalkStatus.CHECKSUM = (data[7] >> 2) & 0x0F;
 }
 
 // 解析STALK_STATUS_2 (ID: 891)
@@ -355,16 +321,12 @@ void HondaCAN::parseStalkStatus2(uint8_t data[8])
   StalkStatus2.LOW_BEAMS = (data[4] >> 3) & 0x01;
   StalkStatus2.HIGH_BEAMS = (data[4] >> 2) & 0x01;
   StalkStatus2.PARK_LIGHTS = (data[4] >> 4) & 0x01;
-  StalkStatus2.COUNTER = (data[7] >> 6) & 0x03;
-  StalkStatus2.CHECKSUM = (data[7] >> 2) & 0x0F;
 }
 
 // 解析ODOMETER (ID: 1302)
 void HondaCAN::parseOdometer(uint8_t data[8])
 {
   Odometer.ODOMETER = (uint32_t)((data[0] << 16) | (data[1] << 8) | data[2]);
-  Odometer.COUNTER = (data[7] >> 6) & 0x03;
-  Odometer.CHECKSUM = (data[7] >> 2) & 0x0F;
 }
 
 // 解析GEARBOX_CVT (ID: 401)
@@ -381,8 +343,6 @@ void HondaCAN::parseGearboxCvt(uint8_t data[8])
   GearboxCvt.SHIFTER_POSITION_VALID = (data[5] >> 5) & 0x01;
   GearboxCvt.NOT_FORWARD_GEAR = (data[6] >> 0) & 0x01;
   GearboxCvt.CVT_UNKNOWN_3 = (data[6] >> 5) & 0x03;
-  GearboxCvt.CHECKSUM = (data[7] >> 2) & 0x0F;
-  GearboxCvt.COUNTER = (data[7] >> 6) & 0x03;
 }
 
 // 解析GEARBOX (ID: 422)
@@ -417,10 +377,6 @@ void HondaCAN::parseCruiseData(uint8_t data[8])
     
     // BOH3: 位55-62 (8 bits)
     CruiseData.BOH3 = data[6];
-    
-    // COUNTER和CHECKSUM: 位59-62
-    CruiseData.CHECKSUM = (data[7] >> 2) & 0x0F;  // 位59-62 (4 bits)
-    CruiseData.COUNTER = (data[7] >> 6) & 0x03;   // 位61-62 (2 bits)
 }
 // ================== OBD2功能 ==================
 
