@@ -3,6 +3,60 @@
 #include "lv_conf.h"
 #include "SPI.h"
 
+//#define USE_BLE
+#ifdef USE_BLE
+#include <BLEServer.h>
+#include <BLEDevice.h>
+
+#define RACECHRONO_UUID "00001ff8-0000-1000-8000-00805f9b34fb"
+
+bool deviceConnected = false;
+bool oldDeviceConnected = false;
+
+BLEServer *BLE_server = NULL;
+BLECharacteristic *BLE_CAN_Characteristic = NULL; // RaceChrono CAN characteristic UUID 0x01
+
+String device_name = "RC_DIY_" + String((uint16_t)((uint64_t)ESP.getEfuseMac() >> 32));
+
+// Bluetooth Low Energy BLEServerCallbacks
+class ServerCallbacks : public BLEServerCallbacks
+{
+  void onConnect(BLEServer *BLE_server)
+  {
+    deviceConnected = true;
+    Serial.println("[I] Bluetooth client connected!");
+  };
+
+  void onDisconnect(BLEServer *BLE_server)
+  {
+    deviceConnected = false;
+    Serial.println("[I] Bluetooth client disconnected!");
+  }
+};
+
+// BLE configuration
+void configBLE()
+{
+  BLEDevice::init(device_name.c_str());
+  BLE_server = BLEDevice::createServer();
+  BLE_server->setCallbacks(new ServerCallbacks());
+  BLEService *BLE_service = BLE_server->createService(RACECHRONO_UUID);
+
+  // GPS main characteristic definition
+  BLE_CAN_Characteristic = BLE_service->createCharacteristic(BLEUUID((uint16_t)0x1), BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY | BLECharacteristic::PROPERTY_INDICATE);
+  //BLE_CAN_Characteristic->addDescriptor(new BLE2902());
+
+  BLE_service->start();
+
+  BLEAdvertising *BLE_advertising = BLEDevice::getAdvertising();
+  BLE_advertising->addServiceUUID(RACECHRONO_UUID);
+  BLE_advertising->setScanResponse(false);
+  BLE_advertising->setMinInterval(100);
+  BLE_advertising->setMaxInterval(100);
+  BLEDevice::startAdvertising();
+}
+#endif
+
 #define TFT_DC 46
 #define TFT_RST 21
 #define TFT_CS 10
@@ -243,7 +297,9 @@ void setup() {
     digitalWrite(TFT_LED, HIGH);
     pinMode(BTN_PIN, INPUT_PULLUP);
 
-
+    #ifdef USE_BLE
+        configBLE();
+    #endif
     // 初始化显示屏
     tft->begin(SPI_FREQUENCY);
     tft->fillScreen(BLACK);
