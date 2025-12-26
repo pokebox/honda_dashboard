@@ -1,0 +1,233 @@
+#include "honda_data.pb-c.h"
+#include "can_handler.h"
+
+class CarDataProcessor {
+private:
+    //static MessageHeader msg_header;
+    CarStatus car_data;
+    PowertrainData powertrain_data;
+    EngineData engine_data;
+    GasPedal2 gas_pedal2;
+    SteeringSensors steering_sensors;
+    KinematicsAlt kinematics_alt;
+    VsaStatus vsa_status;
+    Standstill standstill;
+    WheelSpeeds wheel_speeds;
+    VehicleDynamics vehicle_dynamics;
+    SteerMotorTorque steer_motor_torque;
+    EpbStatus epb_status;
+    EconStatus econ_status;
+    RoughWheelSpeed rough_wheel_speed;
+    ScmButtons scm_buttons;
+    SeatbeltStatus seatbelt_status;
+    CarSpeed car_speed;
+    ScmFeedback scm_feedback;
+    StalkStatus stalk_status;
+    StalkStatus2 stalk_status2;
+    DoorsStatus doors_status;
+    Odometer odometer;
+    EngineData3 engine_data3;
+    CanHandler& canHandler;
+public:
+    CarDataProcessor(CanHandler& handler): canHandler(handler) {
+        // msg_header = MESSAGE_HEADER__INIT;
+        car_data = CAR_STATUS__INIT;
+        powertrain_data = POWERTRAIN_DATA__INIT;
+        engine_data = ENGINE_DATA__INIT;
+        gas_pedal2 = GAS_PEDAL2__INIT;
+        steering_sensors = STEERING_SENSORS__INIT;
+        kinematics_alt = KINEMATICS_ALT__INIT;
+        vsa_status = VSA_STATUS__INIT;
+        standstill = STANDSTILL__INIT;
+        wheel_speeds = WHEEL_SPEEDS__INIT;
+        vehicle_dynamics = VEHICLE_DYNAMICS__INIT;
+        steer_motor_torque = STEER_MOTOR_TORQUE__INIT;
+        epb_status = EPB_STATUS__INIT;
+        econ_status = ECON_STATUS__INIT;
+        rough_wheel_speed = ROUGH_WHEEL_SPEED__INIT;
+        scm_buttons = SCM_BUTTONS__INIT;
+        seatbelt_status = SEATBELT_STATUS__INIT;
+        car_speed = CAR_SPEED__INIT;
+        scm_feedback = SCM_FEEDBACK__INIT;
+        stalk_status = STALK_STATUS__INIT;
+        stalk_status2 = STALK_STATUS2__INIT;
+        doors_status = DOORS_STATUS__INIT;
+        odometer = ODOMETER__INIT;
+        engine_data3 = ENGINE_DATA3__INIT;
+        setupCarStatusPointers();
+    }
+
+    void setupCarStatusPointers() {
+        // 设置枚举类型，表示哪个字段被设置
+        car_data.powertrain_data_case = CAR_STATUS__POWERTRAIN_DATA_POWERTRAIN;
+        car_data.engine_data_case = CAR_STATUS__ENGINE_DATA_ENGINE;
+        car_data.gas_pedal_2_data_case = CAR_STATUS__GAS_PEDAL_2_DATA_GAS_PEDAL2;
+        car_data.steering_data_case = CAR_STATUS__STEERING_DATA_STEERING_SENSORS;
+        car_data.kinematics_data_case = CAR_STATUS__KINEMATICS_DATA_KINEMATICS_ALT;
+        car_data.vsa_status_data_case = CAR_STATUS__VSA_STATUS_DATA_VSA_STATUS;
+        car_data.standstill_data_case = CAR_STATUS__STANDSTILL_DATA_STANDSTILL;
+        car_data.wheel_speeds_data_case = CAR_STATUS__WHEEL_SPEEDS_DATA_WHEELS_SPEEDS;
+        car_data.vehicle_dynamics_data_case = CAR_STATUS__VEHICLE_DYNAMICS_DATA_DYNAMICS;
+        car_data.steer_motor_torque_data_case = CAR_STATUS__STEER_MOTOR_TORQUE_DATA_STEER_MOTOR_TORQUE;
+        car_data.epb_status_data_case = CAR_STATUS__EPB_STATUS_DATA_EPB_STATUS;
+        car_data.econ_status_data_case = CAR_STATUS__ECON_STATUS_DATA_ECON_STATUS;
+        car_data.rough_wheel_speed_data_case = CAR_STATUS__ROUGH_WHEEL_SPEED_DATA_ROUGH_WHEEL_SPEED;
+        car_data.scm_buttons_data_case = CAR_STATUS__SCM_BUTTONS_DATA_SCM_BUTTONS;
+        car_data.seatbelt_status_data_case = CAR_STATUS__SEATBELT_STATUS_DATA_SEATBELT_STATUS;
+        car_data.car_speed_data_case = CAR_STATUS__CAR_SPEED_DATA_CAR_SPEED;
+        car_data.scm_feedback_data_case = CAR_STATUS__SCM_FEEDBACK_DATA_SCM_FEEDBACK;
+        car_data.stalk_status_data_case = CAR_STATUS__STALK_STATUS_DATA_STALK_STATUS;
+        car_data.stalk_status_2_data_case = CAR_STATUS__STALK_STATUS_2_DATA_STALK_STATUS2;
+        car_data.doors_status_data_case = CAR_STATUS__DOORS_STATUS_DATA_DOORS_STATUS;
+        car_data.odometer_data_case = CAR_STATUS__ODOMETER_DATA_ODOMETER;
+        car_data.engine_data_3_case = CAR_STATUS__ENGINE_DATA_3_ENGINE_DATA3;
+        
+        // 设置实际的指针字段
+        car_data.powertrain = &powertrain_data;
+        car_data.engine = &engine_data;
+        car_data.gaspedal2 = &gas_pedal2;
+        car_data.steeringsensors = &steering_sensors;
+        car_data.kinematicsalt = &kinematics_alt;
+        car_data.vsastatus = &vsa_status;
+        car_data.standstill = &standstill;
+        car_data.wheelsspeeds = &wheel_speeds;
+        car_data.dynamics = &vehicle_dynamics;
+        car_data.steermotortorque = &steer_motor_torque;
+        car_data.epbstatus = &epb_status;
+        car_data.econstatus = &econ_status;
+        car_data.roughwheelspeed = &rough_wheel_speed;
+        car_data.scmbuttons = &scm_buttons;
+        car_data.seatbeltstatus = &seatbelt_status;
+        car_data.carspeed = &car_speed;
+        car_data.scmfeedback = &scm_feedback;
+        car_data.stalkstatus = &stalk_status;
+        car_data.stalkstatus2 = &stalk_status2;
+        car_data.doorsstatus = &doors_status;
+        car_data.odometer = &odometer;
+        car_data.enginedata3 = &engine_data3;
+    }
+
+    void updateData() {
+        powertrain_data.pedal_gas = canHandler.CAN.Powertrain.PEDAL_GAS;
+        powertrain_data.engine_rpm = canHandler.CAN.Powertrain.ENGINE_RPM;
+        powertrain_data.gas_pressed = canHandler.CAN.Powertrain.GAS_PRESSED;
+        powertrain_data.acc_status = canHandler.CAN.Powertrain.ACC_STATUS;
+        powertrain_data.boh_17c = canHandler.CAN.Powertrain.BOH_17C;
+        powertrain_data.brake_switch = canHandler.CAN.Powertrain.BRAKE_SWITCH;
+        powertrain_data.boh2_17c = canHandler.CAN.Powertrain.BOH2_17C;
+        powertrain_data.brake_pressed = canHandler.CAN.Powertrain.BRAKE_PRESSED;
+        powertrain_data.boh3_17c = canHandler.CAN.Powertrain.BOH3_17C;
+
+        engine_data.xmission_speed = canHandler.CAN.EngineData.XMISSION_SPEED;
+        engine_data.engine_rpm = canHandler.CAN.EngineData.ENGINE_RPM;
+        engine_data.xmission_speed2 = canHandler.CAN.EngineData.XMISSION_SPEED2;
+        engine_data.odometer = canHandler.CAN.EngineData.ODOMETER;
+
+        gas_pedal2.engine_torque_estimate = canHandler.CAN.GasPedal2.ENGINE_TORQUE_ESTIMATE;
+        gas_pedal2.engine_torque_request = canHandler.CAN.GasPedal2.ENGINE_TORQUE_REQUEST;
+        gas_pedal2.car_gas = canHandler.CAN.GasPedal2.CAR_GAS;
+
+        steering_sensors.steer_angle = canHandler.CAN.SteeringSensors.STEER_ANGLE;
+        steering_sensors.steer_angle_rate = canHandler.CAN.SteeringSensors.STEER_ANGLE_RATE;
+        steering_sensors.steer_sensor_status_1 = canHandler.CAN.SteeringSensors.STEER_SENSOR_STATUS_1;
+        steering_sensors.steer_sensor_status_2 = canHandler.CAN.SteeringSensors.STEER_SENSOR_STATUS_2;
+        steering_sensors.steer_sensor_status_3 = canHandler.CAN.SteeringSensors.STEER_SENSOR_STATUS_3;
+        steering_sensors.steer_wheel_angle = canHandler.CAN.SteeringSensors.STEER_WHEEL_ANGLE;
+
+        kinematics_alt.lat_accel = canHandler.CAN.KinematicsAlt.LAT_ACCEL;
+        kinematics_alt.long_accel = canHandler.CAN.KinematicsAlt.LONG_ACCEL;
+
+        vsa_status.user_brake = canHandler.CAN.VsaStatus.USER_BRAKE;
+        vsa_status.computer_braking = canHandler.CAN.VsaStatus.COMPUTER_BRAKING;
+        vsa_status.esp_disabled = canHandler.CAN.VsaStatus.ESP_DISABLED;
+        vsa_status.brake_hold_related = canHandler.CAN.VsaStatus.BRAKE_HOLD_RELATED;
+        vsa_status.brake_hold_active = canHandler.CAN.VsaStatus.BRAKE_HOLD_ACTIVE;
+        vsa_status.brake_hold_enabled = canHandler.CAN.VsaStatus.BRAKE_HOLD_ENABLED;
+
+        standstill.controlled_standstill = canHandler.CAN.Standstill.CONTROLLED_STANDSTILL;
+        standstill.wheels_moving = canHandler.CAN.Standstill.WHEELS_MOVING;
+        standstill.brake_error_1 = canHandler.CAN.Standstill.BRAKE_ERROR_1;
+        standstill.brake_error_2 = canHandler.CAN.Standstill.BRAKE_ERROR_2;
+
+        wheel_speeds.wheel_speed_fl = canHandler.CAN.WheelSpeeds.WHEEL_SPEED_FL;
+        wheel_speeds.wheel_speed_fr = canHandler.CAN.WheelSpeeds.WHEEL_SPEED_FR;
+        wheel_speeds.wheel_speed_rl = canHandler.CAN.WheelSpeeds.WHEEL_SPEED_RL;
+        wheel_speeds.wheel_speed_rr = canHandler.CAN.WheelSpeeds.WHEEL_SPEED_RR;
+
+        vehicle_dynamics.lat_accel = canHandler.CAN.VehicleDynamics.LAT_ACCEL;
+        vehicle_dynamics.long_accel = canHandler.CAN.VehicleDynamics.LONG_ACCEL;
+
+        steer_motor_torque.config_valid = canHandler.CAN.SteerMotorTorque.CONFIG_VALID;
+        steer_motor_torque.motor_torque = canHandler.CAN.SteerMotorTorque.MOTOR_TORQUE;
+        steer_motor_torque.output_disabled = canHandler.CAN.SteerMotorTorque.OUTPUT_DISABLED;
+
+        epb_status.epb_brake_and_pull = canHandler.CAN.EpbStatus.EPB_BRAKE_AND_PULL;
+        epb_status.epb_active = canHandler.CAN.EpbStatus.EPB_ACTIVE;
+        //epb_status.epb_state = canHandler.CAN.EpbStatus.EPB_STATE;
+
+        econ_status.econ_on_2 = canHandler.CAN.EconStatus.ECON_ON_2;
+        econ_status.econ_on = canHandler.CAN.EconStatus.ECON_ON;
+
+        rough_wheel_speed.wheel_speed_fl = canHandler.CAN.RoughWheelSpeed.WHEEL_SPEED_FL;
+        rough_wheel_speed.wheel_speed_fr = canHandler.CAN.RoughWheelSpeed.WHEEL_SPEED_FR;
+        rough_wheel_speed.wheel_speed_rl = canHandler.CAN.RoughWheelSpeed.WHEEL_SPEED_RL;
+        rough_wheel_speed.wheel_speed_rr = canHandler.CAN.RoughWheelSpeed.WHEEL_SPEED_RR;
+        rough_wheel_speed.set_to_x55 = canHandler.CAN.RoughWheelSpeed.SET_TO_X55;
+        rough_wheel_speed.set_to_x55_2 = canHandler.CAN.RoughWheelSpeed.SET_TO_X55_2;
+        rough_wheel_speed.long_counter = canHandler.CAN.RoughWheelSpeed.LONG_COUNTER;
+
+        //scm_buttons.cruise_buttons = canHandler.CAN.ScmButtons.CRUISE_BUTTONS;
+        scm_buttons.cruise_setting = canHandler.CAN.ScmButtons.CRUISE_SETTING;
+
+        seatbelt_status.seatbelt_driver_lamp = canHandler.CAN.SeatbeltStatus.SEATBELT_DRIVER_LAMP;
+        seatbelt_status.seatbelt_pass_unlatched = canHandler.CAN.SeatbeltStatus.SEATBELT_PASS_UNLATCHED;
+        seatbelt_status.seatbelt_pass_latched = canHandler.CAN.SeatbeltStatus.SEATBELT_PASS_LATCHED;
+        seatbelt_status.seatbelt_driver_unlatched = canHandler.CAN.SeatbeltStatus.SEATBELT_DRIVER_UNLATCHED;
+        seatbelt_status.seatbelt_driver_latched = canHandler.CAN.SeatbeltStatus.SEATBELT_DRIVER_LATCHED;
+        seatbelt_status.pass_airbag_off = canHandler.CAN.SeatbeltStatus.PASS_AIRBAG_OFF;
+        seatbelt_status.pass_airbag_on = canHandler.CAN.SeatbeltStatus.PASS_AIRBAG_ON;
+
+        car_speed.rough_car_speed = canHandler.CAN.CarSpeed.ROUGH_CAR_SPEED;
+        car_speed.rough_car_speed_2 = canHandler.CAN.CarSpeed.ROUGH_CAR_SPEED_2;
+        car_speed.rough_car_speed_3 = canHandler.CAN.CarSpeed.ROUGH_CAR_SPEED_3;
+        car_speed.car_speed = canHandler.CAN.CarSpeed.CAR_SPEED;
+        car_speed.lock_status = canHandler.CAN.CarSpeed.LOCK_STATUS;
+        car_speed.imperial_unit = canHandler.CAN.CarSpeed.IMPERIAL_UNIT;
+
+        scm_feedback.drivers_door_open = canHandler.CAN.ScmFeedback.DRIVERS_DOOR_OPEN;
+        scm_feedback.reverse_light = canHandler.CAN.ScmFeedback.REVERSE_LIGHT;
+        //scm_feedback.cmbs_button = canHandler.CAN.ScmFeedback.CMBS_BUTTON;
+        scm_feedback.left_blinker = canHandler.CAN.ScmFeedback.LEFT_BLINKER;
+        scm_feedback.right_blinker = canHandler.CAN.ScmFeedback.RIGHT_BLINKER;
+        scm_feedback.main_on = canHandler.CAN.ScmFeedback.MAIN_ON;
+        scm_feedback.parking_brake_on = canHandler.CAN.ScmFeedback.PARKING_BRAKE_ON;
+
+        stalk_status.dashboard_alert = canHandler.CAN.StalkStatus.DASHBOARD_ALERT;
+        stalk_status.auto_headlights = canHandler.CAN.StalkStatus.AUTO_HEADLIGHTS;
+        stalk_status.high_beam_hold = canHandler.CAN.StalkStatus.HIGH_BEAM_HOLD;
+        stalk_status.high_beam_flash = canHandler.CAN.StalkStatus.HIGH_BEAM_FLASH;
+        stalk_status.headlights_on = canHandler.CAN.StalkStatus.HEADLIGHTS_ON;
+        stalk_status.wiper_switch = canHandler.CAN.StalkStatus.WIPER_SWITCH;
+
+        stalk_status2.wipers = canHandler.CAN.StalkStatus2.WIPERS;
+        stalk_status2.low_beams = canHandler.CAN.StalkStatus2.LOW_BEAMS;
+        stalk_status2.high_beams = canHandler.CAN.StalkStatus2.HIGH_BEAMS;
+        stalk_status2.park_lights = canHandler.CAN.StalkStatus2.PARK_LIGHTS;
+
+        doors_status.door_open_fl = canHandler.CAN.DoorsStatus.DOOR_OPEN_FL;
+        doors_status.door_open_fr = canHandler.CAN.DoorsStatus.DOOR_OPEN_FR;
+        doors_status.door_open_rl = canHandler.CAN.DoorsStatus.DOOR_OPEN_RL;
+        doors_status.door_open_rr = canHandler.CAN.DoorsStatus.DOOR_OPEN_RR;
+        doors_status.trunk_open = canHandler.CAN.DoorsStatus.TRUNK_OPEN;
+
+        odometer.odometer = canHandler.CAN.Odometer.ODOMETER;
+
+        engine_data3.engine_temp = canHandler.CAN.EngineDataThree.ENGINE_TEMP;
+        engine_data3.intake_temp = canHandler.CAN.EngineDataThree.INTAKE_TEMP;
+        engine_data3.trip_fuel_consumed = canHandler.CAN.EngineDataThree.TRIP_FUEL_CONSUMED;
+    }
+
+    CarStatus *getCarStatus() {
+        return &car_data;
+    }
+};

@@ -32,12 +32,12 @@ public:
     bool getTrunk() const { return CAN.DoorsStatus.TRUNK_OPEN; }
     
     String getVIN();
+    HondaCAN CAN;
     
 private:
     CanHandler();
     ~CanHandler() = default;
     
-    HondaCAN CAN;
     
     // 禁用复制和赋值
     CanHandler(const CanHandler&) = delete;

@@ -2,106 +2,20 @@
 #include "display.h"
 #include "can_handler.h"
 #include "ui_dashboard.h"
+#include "honda_data.pb-c.h"
+#include "carDataProcessor.hpp"
+#include "esp_broadcast.hpp"
+
 
 // 全局对象引用
 DisplayManager& display = DisplayManager::getInstance();
 CanHandler& canHandler = CanHandler::getInstance();
 DashboardUI& dashboard = DashboardUI::getInstance();
 
+CarDataProcessor carProcessor(canHandler);
+
 // CAN任务函数声明
 void canTask(void *arg);
-
-#ifdef USE_BROADCAST
-#include "ESP32_NOW.h"
-#include "WiFi.h"
-
-#include <esp_mac.h>  // For the MAC2STR and MACSTR macros
-
-class ESP_NOW_Broadcast_Peer : public ESP_NOW_Peer {
-public:
-  // Constructor of the class using the broadcast address
-  ESP_NOW_Broadcast_Peer(uint8_t channel, wifi_interface_t iface, const uint8_t *lmk) : ESP_NOW_Peer(ESP_NOW.BROADCAST_ADDR, channel, iface, lmk) {}
-
-  // Destructor of the class
-  ~ESP_NOW_Broadcast_Peer() {
-    remove();
-  }
-
-  // Function to properly initialize the ESP-NOW and register the broadcast peer
-  bool begin() {
-    if (!ESP_NOW.begin((const uint8_t *)ESPNOW_PMK) || !add()) {
-      log_e("Failed to initialize ESP-NOW or register the broadcast peer");
-      return false;
-    }
-    return true;
-  }
-
-  // Function to send a message to all devices within the network
-  bool send_message(const uint8_t *data, size_t len) {
-    if (!send(data, len)) {
-      log_e("Failed to broadcast message");
-      return false;
-    }
-    return true;
-  }
-};
-ESP_NOW_Broadcast_Peer broadcast_peer(ESPNOW_WIFI_CHANNEL, WIFI_IF_STA, NULL);
-
-#endif
-
-#ifdef USE_BLE
-#include <BLEServer.h>
-#include <BLEDevice.h>
-
-#define RACECHRONO_UUID "00001ff8-0000-1000-8000-00805f9b34fb"
-
-bool deviceConnected = false;
-bool oldDeviceConnected = false;
-
-BLEServer *BLE_server = NULL;
-BLECharacteristic *BLE_CAN_Characteristic = NULL; // RaceChrono CAN characteristic UUID 0x01
-
-String device_name = "RC_DIY_" + String((uint16_t)((uint64_t)ESP.getEfuseMac() >> 32));
-
-// Bluetooth Low Energy BLEServerCallbacks
-class ServerCallbacks : public BLEServerCallbacks
-{
-  void onConnect(BLEServer *BLE_server)
-  {
-    deviceConnected = true;
-    Serial.println("[I] Bluetooth client connected!");
-  };
-
-  void onDisconnect(BLEServer *BLE_server)
-  {
-    deviceConnected = false;
-    Serial.println("[I] Bluetooth client disconnected!");
-  }
-};
-
-// BLE configuration
-void configBLE()
-{
-  BLEDevice::init(device_name.c_str());
-  BLE_server = BLEDevice::createServer();
-  BLE_server->setCallbacks(new ServerCallbacks());
-  BLEService *BLE_service = BLE_server->createService(RACECHRONO_UUID);
-
-  // GPS main characteristic definition
-  BLE_CAN_Characteristic = BLE_service->createCharacteristic(BLEUUID((uint16_t)0x1), BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY | BLECharacteristic::PROPERTY_INDICATE);
-  //BLE_CAN_Characteristic->addDescriptor(new BLE2902());
-
-  BLE_service->start();
-
-  BLEAdvertising *BLE_advertising = BLEDevice::getAdvertising();
-  BLE_advertising->addServiceUUID(RACECHRONO_UUID);
-  BLE_advertising->setScanResponse(false);
-  BLE_advertising->setMinInterval(100);
-  BLE_advertising->setMaxInterval(100);
-  BLEDevice::startAdvertising();
-}
-#endif
-
 
 void setup() {
     Serial.begin(115200);
@@ -189,21 +103,35 @@ void loop() {
     delay(1);
 }
 
+
 void canTask(void *arg) {
     Serial.println("CAN任务启动，运行在Core " + String(xPortGetCoreID()));
     
     while (1) {
         // 处理CAN数据
         canHandler.run();
-        
+
+        carProcessor.updateData();
+        CarStatus *car_data = carProcessor.getCarStatus();
+        size_t packed_size = car_status__get_packed_size(car_data);
+        uint8_t *data = (uint8_t*)malloc(packed_size);
+        if (data == NULL) {
+            Serial.println("Failed to allocate memory for packet");
+            vTaskDelay(pdMS_TO_TICKS(1));
+            continue;
+        }
+
+        car_status__pack(car_data, data);
+
         // 广播数据
 #ifdef USE_BROADCAST
-        char data[16];
-        snprintf(data, sizeof(data), "%d rpm", canHandler.getEngineRPM());
-        if (!broadcast_peer.send_message((uint8_t *)data, sizeof(data))) {
-            Serial.println("Failed to broadcast message");
+        if (!broadcast_peer.send_message(data, packed_size)) {
+            Serial.println("Failed to broadcast message "+ String(packed_size));
         }
 #endif
+
+        // 释放缓冲区
+        free(data);
         
         vTaskDelay(pdMS_TO_TICKS(1));
     }
@@ -310,21 +238,10 @@ void updateDashboard() {
     );
     
     // 调试输出
-    static uint32_t last_uart_update = 0;
-    if (now - last_uart_update >= 100) {
-        Serial.printf(
-            "刹车: %.1f, 电脑刹车: %d, ESP禁用: %d, 刹车保持相关: %d, 刹车保持激活: %d, 刹车保持启用: %d\n",
-            canHandler.getUserBrake(),
-            // 注意：这里需要添加相应的CAN数据访问方法
-            // CAN.VsaStatus.COMPUTER_BRAKING,
-            // CAN.VsaStatus.ESP_DISABLED,
-            // CAN.VsaStatus.BRAKE_HOLD_RELATED,
-            // CAN.VsaStatus.BRAKE_HOLD_ACTIVE,
-            // CAN.VsaStatus.BRAKE_HOLD_ENABLED
-            0, 0, 0, 0, 0  // 临时占位符
-        );
-        last_uart_update = now;
-    }
+    // static uint32_t last_uart_update = 0;
+    // if (now - last_uart_update >= 100) {
+    //     last_uart_update = now;
+    // }
     
     last_update = now;
 }

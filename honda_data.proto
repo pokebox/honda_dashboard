@@ -1,0 +1,480 @@
+syntax = "proto3";
+
+
+// 导入时间戳类型
+// import "google/protobuf/timestamp.proto";
+
+// ==================== 枚举定义 ====================
+
+// EPB状态枚举
+enum EPBState {
+  EPB_STATE_OFF = 0;
+  EPB_STATE_ENGAGING = 1;
+  EPB_STATE_DISENGAGING = 2;
+  EPB_STATE_ON = 3;
+}
+
+// 巡航按钮枚举
+enum CruiseButton {
+  CRUISE_BUTTON_NONE = 0;
+  CRUISE_BUTTON_MAIN = 1;
+  CRUISE_BUTTON_CANCEL = 2;
+  CRUISE_BUTTON_DECEL_SET = 3;
+  CRUISE_BUTTON_ACCEL_RES = 4;
+  CRUISE_BUTTON_TBD_5 = 5;
+  CRUISE_BUTTON_TBD_6 = 6;
+  CRUISE_BUTTON_TBD_7 = 7;
+}
+
+// CMBS按钮枚举
+enum CMBSButton {
+  CMBS_BUTTON_RELEASED = 0;
+  CMBS_BUTTON_PRESSED = 3;
+}
+
+// 档位选择器枚举
+enum GearShifter {
+  GEAR_NONE = 0;
+    GEAR_P = 1;
+    GEAR_R = 2;
+    GEAR_N = 4;
+    GEAR_D = 8;
+    GEAR_S = 16;
+    GEAR_L = 32;
+}
+
+// 雨刷状态枚举
+enum WiperStatus {
+  WIPER_OFF = 0;
+  WIPER_LOW = 2;
+  WIPER_HIGH = 4;
+}
+
+// ==================== 消息定义 ====================
+
+// 消息头，包含时间戳和CAN ID信息
+message MessageHeader {
+  uint32 can_id = 1;
+  // google.protobuf.Timestamp timestamp = 1;
+  uint64 timestamp = 2;  // 时间戳，单位：微秒
+}
+
+// ID: 380 - POWERTRAIN_DATA 动力总成数据 20Hz
+message PowertrainData {
+  MessageHeader header = 1;
+  
+  uint32 pedal_gas = 2;         // 油门踏板 [0|255]
+  uint32 engine_rpm = 3;        // 发动机转速 [0|15000] rpm
+  bool gas_pressed = 4;         // 油门是否被按下
+  bool acc_status = 5;          // ACC状态
+  uint32 boh_17c = 6;           // 位37-41 (5 bits)
+  bool brake_switch = 7;        // 刹车开关
+  uint32 boh2_17c = 8;          // 位47-56 (10 bits)
+  bool brake_pressed = 9;       // 刹车是否被按下
+  uint32 boh3_17c = 10;         // 位52-56 (5 bits)
+}
+
+// ID: 344 - ENGINE_DATA 发动机数据 20Hz
+message EngineData {
+  MessageHeader header = 1;
+  
+  float xmission_speed = 2;     // 变速箱速度 (kph)
+  uint32 engine_rpm = 3;        // 发动机转速 [0|15000] rpm
+  float xmission_speed2 = 4;    // 变速箱速度2 (kph)
+  uint32 odometer = 5;          // 里程表 (单位: 10米)
+}
+
+// ID: 304 - GAS_PEDAL_2 油门踏板数据2 20Hz
+message GasPedal2 {
+  MessageHeader header = 1;
+  
+  int32 engine_torque_estimate = 2;  // 发动机扭矩估计 [-1000|1000] Nm
+  int32 engine_torque_request = 3;   // 发动机扭矩请求 [-1000|1000] Nm
+  uint32 car_gas = 4;                 // 油门踏板 [0|255]
+}
+
+// ID: 330 - STEERING_SENSORS 转向传感器数据 20Hz
+message SteeringSensors {
+  MessageHeader header = 1;
+  
+  float steer_angle = 2;            // 转向角度 [-500|500] deg
+  float steer_angle_rate = 3;       // 转向角速度 [-3000|3000] deg/s
+  bool steer_sensor_status_1 = 4;   // 转向传感器状态1
+  bool steer_sensor_status_2 = 5;   // 转向传感器状态2
+  bool steer_sensor_status_3 = 6;   // 转向传感器状态3
+  float steer_wheel_angle = 7;      // 转向盘角度 [-500|500] deg
+}
+
+// ID: 148 - KINEMATICS_ALT 运动学数据（替代） 20Hz
+message KinematicsAlt {
+  MessageHeader header = 1;
+  
+  float lat_accel = 2;    // 横向加速度 [-20|20] m/s²
+  float long_accel = 3;   // 纵向加速度 [-20|20] m/s²
+}
+
+// ID: 420 - VSA_STATUS 车辆稳定性控制系统状态 10Hz
+message VsaStatus {
+  MessageHeader header = 1;
+  
+  float user_brake = 2;           // 用户刹车 [0|1000] (单位: 0.015625, 偏移: -1.609375)
+  bool computer_braking = 3;      // 电脑刹车
+  bool esp_disabled = 4;          // ESP禁用
+  bool brake_hold_related = 5;    // 刹车保持相关
+  bool brake_hold_active = 6;     // 刹车保持激活
+  bool brake_hold_enabled = 7;    // 刹车保持启用
+}
+
+// ID: 432 - STANDSTILL 静止状态 10Hz
+message Standstill {
+  MessageHeader header = 1;
+  
+  bool controlled_standstill = 2;  // 受控静止
+  bool wheels_moving = 3;          // 车轮移动
+  bool brake_error_1 = 4;          // 刹车错误1
+  bool brake_error_2 = 5;          // 刹车错误2
+}
+
+// ID: 464 - WHEEL_SPEEDS 车轮速度 10Hz
+message WheelSpeeds {
+  MessageHeader header = 1;
+  
+  float wheel_speed_fl = 2;  // 左前轮速度 [0|250] kph
+  float wheel_speed_fr = 3;  // 右前轮速度 [0|250] kph
+  float wheel_speed_rl = 4;  // 左后轮速度 [0|250] kph
+  float wheel_speed_rr = 5;  // 右后轮速度 [0|250] kph
+}
+
+// ID: 490 - VEHICLE_DYNAMICS 车辆动力学数据 10Hz
+message VehicleDynamics {
+  MessageHeader header = 1;
+  
+  float lat_accel = 2;   // 横向加速度 [-20|20] m/s²
+  float long_accel = 3;  // 纵向加速度 [-20|20] m/s²
+}
+
+// ID: 427 - STEER_MOTOR_TORQUE 转向电机扭矩 10Hz
+message SteerMotorTorque {
+  MessageHeader header = 1;
+  
+  bool config_valid = 2;      // 配置有效
+  uint32 motor_torque = 3;    // 电机扭矩 [0|256]
+  bool output_disabled = 4;   // 输出禁用
+}
+
+// ID: 450 - EPB_STATUS 电子驻车制动状态 10Hz
+message EpbStatus {
+  MessageHeader header = 1;
+  
+  bool epb_brake_and_pull = 2;  // EPB刹车和拉动
+  bool epb_active = 3;          // EPB激活
+  EPBState epb_state = 4;       // EPB状态
+}
+
+// ID: 545 - ECON_STATUS 经济模式状态 5Hz
+message EconStatus {
+  MessageHeader header = 1;
+  
+  uint32 econ_on_2 = 2;  // 经济模式2 [0|3]
+  bool econ_on = 3;      // 经济模式
+}
+
+// ID: 597 - ROUGH_WHEEL_SPEED 粗略车轮速度 5Hz
+message RoughWheelSpeed {
+  MessageHeader header = 1;
+  
+  uint32 wheel_speed_fl = 2;  // 左前轮速度 [0|255] kph
+  uint32 wheel_speed_fr = 3;  // 右前轮速度 [0|255] kph
+  uint32 wheel_speed_rl = 4;  // 左后轮速度 [0|255] kph
+  uint32 wheel_speed_rr = 5;  // 右后轮速度 [0|255] kph
+  uint32 set_to_x55 = 6;      // 设置为0x55 [0|255]
+  uint32 set_to_x55_2 = 7;    // 设置为0x55_2 [0|255]
+  uint32 long_counter = 8;    // 长计数器 [0|255]
+}
+
+// ID: 662 - SCM_BUTTONS 方向盘控制按钮 5Hz
+message ScmButtons {
+  MessageHeader header = 1;
+  
+  CruiseButton cruise_buttons = 2;  // 巡航按钮
+  uint32 cruise_setting = 3;        // 巡航设置 [0|3]
+}
+
+// ID: 773 - SEATBELT_STATUS 安全带状态 2.5Hz
+message SeatbeltStatus {
+  MessageHeader header = 1;
+  
+  bool seatbelt_driver_lamp = 2;      // 驾驶员安全带灯
+  bool seatbelt_pass_unlatched = 3;   // 乘客安全带未锁
+  bool seatbelt_pass_latched = 4;     // 乘客安全带已锁
+  bool seatbelt_driver_unlatched = 5; // 驾驶员安全带未锁
+  bool seatbelt_driver_latched = 6;   // 驾驶员安全带已锁
+  bool pass_airbag_off = 7;           // 乘客安全气囊关闭
+  bool pass_airbag_on = 8;            // 乘客安全气囊开启
+}
+
+// ID: 777 - CAR_SPEED 车速 2.5Hz
+message CarSpeed {
+  MessageHeader header = 1;
+  
+  uint32 rough_car_speed = 2;      // 粗略车速 [0|255] mph
+  float car_speed = 3;             // 车速 [0|65535] kph
+  float rough_car_speed_3 = 4;     // 粗略车速3 [0|65535] kph
+  uint32 rough_car_speed_2 = 5;    // 粗略车速2 [0|255] mph
+  uint32 lock_status = 6;          // 锁定状态 [0|255]
+  bool imperial_unit = 7;          // 英制单位
+}
+
+// ID: 806 - SCM_FEEDBACK 方向盘控制反馈 2.5Hz
+message ScmFeedback {
+  MessageHeader header = 1;
+  
+  bool drivers_door_open = 2;  // 驾驶员门开
+  bool reverse_light = 3;      // 倒车灯
+  CMBSButton cmbs_button = 4;  // CMBS按钮
+  bool left_blinker = 5;       // 左转向灯
+  bool right_blinker = 6;      // 右转向灯
+  bool main_on = 7;            // 主开关开启
+  bool parking_brake_on = 8;   // 驻车制动开启
+}
+
+// ID: 884 - STALK_STATUS 拨杆状态 2.5Hz
+message StalkStatus {
+  MessageHeader header = 1;
+  
+  uint32 dashboard_alert = 2;  // 仪表盘警报 [0|255]
+  bool auto_headlights = 3;    // 自动头灯
+  bool high_beam_hold = 4;     // 远光保持
+  bool high_beam_flash = 5;    // 远光闪烁
+  bool headlights_on = 6;      // 头灯开启
+  uint32 wiper_switch = 7;     // 雨刷开关 [0|3]
+}
+
+// ID: 891 - STALK_STATUS_2 拨杆状态2 2.5Hz
+message StalkStatus2 {
+  MessageHeader header = 1;
+  
+  uint32 wipers = 2;      // 雨刷状态
+  bool low_beams = 3;          // 近光灯
+  bool high_beams = 4;         // 远光灯
+  bool park_lights = 5;        // 停车灯
+}
+
+// ID: 1029 - DOORS_STATUS 车门状态 1Hz
+message DoorsStatus {
+  MessageHeader header = 1;
+  
+  bool door_open_fl = 2;  // 左前门开
+  bool door_open_fr = 3;  // 右前门开
+  bool door_open_rl = 4;  // 左后门开
+  bool door_open_rr = 5;  // 右后门开
+  bool trunk_open = 6;    // 行李箱开
+}
+
+// ID: 1302 - ODOMETER 里程表 1Hz
+message Odometer {
+  MessageHeader header = 1;
+  
+  uint32 odometer = 2;  // 里程 [0|16777215] km
+}
+
+// ID: 401 - GEARBOX_CVT CVT变速箱
+message GearboxCvt {
+  MessageHeader header = 1;
+  
+  bool selected_p = 2;                  // P档选择
+  bool selected_r = 3;                  // R档选择
+  bool selected_n = 4;                  // N档选择
+  bool selected_d = 5;                  // D档选择
+  bool forward_driving_mode = 6;        // 前进驾驶模式
+  uint32 cvt_unknown_1 = 7;             // CVT未知1 [0|255]
+  uint32 cvt_unknown_2 = 8;             // CVT未知2 [0|255]
+  GearShifter gear_shifter = 9;         // 档位选择器
+  bool shifter_position_valid = 10;     // 换档位置有效
+  bool not_forward_gear = 11;           // 非前进档
+  uint32 cvt_unknown_3 = 12;            // CVT未知3 [0|3]
+}
+
+// ID: 493 - HUD_SETTING HUD设置
+message HudSetting {
+  MessageHeader header = 1;
+  
+  bool imperial_unit = 2;  // 英制单位
+}
+
+// ID: 804 - CRUISE 定速巡航数据
+message CruiseData {
+  MessageHeader header = 1;
+  
+  uint32 hud_speed_kph = 2;        // HUD显示的车速（公里/小时）[0|255]
+  uint32 hud_speed_mph = 3;        // HUD显示的车速（英里/小时）[0|255]
+  uint32 trip_fuel_consumed = 4;   // 行程燃油消耗 [0|65535]
+  uint32 cruise_speed_pcm = 5;     // PCM设置的巡航速度 [0|255] (255表示未设置速度)
+  int32 boh2 = 6;                  // 未知数据2，有符号 [-128|127]
+  uint32 boh3 = 7;                 // 未知数据3 [0|255]
+}
+
+// ENGINE_DATA_3 发动机数据3
+message EngineData3 {
+  MessageHeader header = 1;
+  
+  uint32 engine_temp = 2;          // 发动机温度
+  uint32 intake_temp = 3;          // 进气温度
+  float trip_fuel_consumed = 4;    // 行程燃油消耗
+}
+
+// DRIVE_MODES 驾驶模式
+message DriveModes {
+  MessageHeader header = 1;
+  
+  bool econ_on = 2;  // 经济模式
+}
+
+// GEARBOX 变速箱
+message Gearbox {
+  MessageHeader header = 1;
+  
+  uint32 gear_shifter = 2;  // 档位选择器 [0|63]
+}
+
+// ==================== 聚合消息 ====================
+
+// 车辆状态聚合消息，包含所有数据
+message CarStatus {
+  //google.protobuf.Timestamp timestamp = 1;
+  uint64 timestamp = 1;  // 时间戳，单位：微秒
+  
+  // 可选的单项数据
+  oneof powertrain_data {
+    PowertrainData powertrain = 380;
+  }
+  
+  oneof engine_data {
+    EngineData engine = 344;
+  }
+  
+  oneof gas_pedal_2_data {
+    GasPedal2 gasPedal2 = 304;
+  }
+
+  oneof steering_data {
+    SteeringSensors steeringSensors = 330;
+  }
+  
+  oneof kinematics_data {
+    KinematicsAlt kinematicsAlt = 148;
+  }
+  
+  oneof vsa_status_data {
+    VsaStatus vsaStatus = 420;
+  }
+
+  oneof standstill_data {
+    Standstill standstill = 432;
+  }
+
+  oneof wheel_speeds_data {
+    WheelSpeeds wheelsSpeeds = 464;
+  }
+  
+  oneof vehicle_dynamics_data {
+    VehicleDynamics dynamics = 490;
+  }
+  
+  oneof steer_motor_torque_data {
+    SteerMotorTorque steerMotorTorque = 427;
+  }
+  
+  oneof epb_status_data {
+    EpbStatus epbStatus = 450;
+  }
+  
+  oneof econ_status_data {
+    EconStatus econStatus = 545;
+  }
+  
+  oneof rough_wheel_speed_data {
+    RoughWheelSpeed roughWheelSpeed = 597;
+  }
+  
+  oneof scm_buttons_data {
+    ScmButtons scmButtons = 662;
+  }
+  
+  oneof seatbelt_status_data {
+    SeatbeltStatus seatbeltStatus = 773;
+  }
+  
+  oneof car_speed_data {
+    CarSpeed carSpeed = 777;
+  }
+  
+  oneof scm_feedback_data {
+    ScmFeedback scmFeedback = 806;
+  }
+  
+  oneof stalk_status_data {
+    StalkStatus stalkStatus = 884;
+  }
+  
+  oneof stalk_status_2_data {
+    StalkStatus2 stalkStatus2 = 891;
+  }
+  
+  oneof doors_status_data {
+    DoorsStatus doorsStatus = 1029;
+  }
+  
+  oneof odometer_data {
+    Odometer odometer = 1302;
+  }
+  
+  oneof gearbox_cvt_data {
+    GearboxCvt gearboxCvt = 401;
+  }
+  
+  oneof hud_setting_data {
+    HudSetting hudSetting = 493;
+  }
+  
+  oneof engine_data_3 {
+    EngineData3 engineData3 = 804;
+  }
+
+}
+
+// 批量数据消息，用于存储时间序列
+message VehicleDataBatch {
+  repeated CarStatus data_points = 1;
+}
+
+// 实时数据流服务
+// service VehicleDataService {
+//   // 获取实时车辆数据流
+//   rpc StreamVehicleData(google.protobuf.Empty) returns (stream CarStatus);
+  
+//   // 批量查询历史数据
+//   rpc QueryHistoricalData(HistoricalQuery) returns (VehicleDataBatch);
+  
+//   // 订阅特定CAN ID的数据
+//   rpc SubscribeToCanId(CanIdSubscription) returns (stream CanData);
+// }
+
+// 查询历史数据的请求
+// message HistoricalQuery {
+//   google.protobuf.Timestamp start_time = 1;
+//   google.protobuf.Timestamp end_time = 2;
+//   repeated uint32 can_ids = 3;  // 要查询的CAN ID列表，为空则查询所有
+// }
+
+// CAN ID订阅请求
+// message CanIdSubscription {
+//   repeated uint32 can_ids = 1;
+// }
+
+// CAN原始数据消息
+message CanData {
+  uint32 can_id = 1;
+  bytes raw_data = 2;
+  //google.protobuf.Timestamp timestamp = 3;
+}
