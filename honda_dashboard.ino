@@ -146,50 +146,38 @@ void updateDashboard() {
         return;
     }
     
-    // 获取车辆数据
-    uint16_t rpm = canHandler.getEngineRPM();
-    float speed = canHandler.getSpeed();
-    float lat_acc = canHandler.getAccelerationLat();
-    float long_acc = canHandler.getAccelerationLong();
-    uint8_t engine_temp = canHandler.getEngineTemp();
-    uint8_t intake_temp = canHandler.getIntakeTemp();
-    float fuel_consumed = canHandler.getFuelConsumed();
-    float steering_angle = canHandler.getSteeringAngle();
-    uint32_t trip_distance = canHandler.getTripDistance();
-    float user_brake = canHandler.getUserBrake();
-    uint8_t gas_pedal = canHandler.getGasPedal();
-    
+
     // 更新UI
     if (dashboard.getLabelRPM()) {
         char buf[16];
-        sprintf(buf, "%d RPM", rpm);
+        sprintf(buf, "%d RPM", canHandler.CAN.Powertrain.ENGINE_RPM);
         lv_label_set_text(dashboard.getLabelRPM(), buf);
     }
     
     if (dashboard.getLabelSpeed()) {
         char buf[16];
-        sprintf(buf, "%.1f km/h", speed);
+        sprintf(buf, "%.1f km/h", canHandler.CAN.EngineData.XMISSION_SPEED);
         lv_label_set_text(dashboard.getLabelSpeed(), buf);
     }
     
     if (dashboard.getLabelGas()) {
         char buf[16];
-        sprintf(buf, "%d %%", map(gas_pedal, 0, 255, 0, 100));
+        sprintf(buf, "%d %%", map(canHandler.CAN.GasPedal2.CAR_GAS, 0, 255, 0, 100));
         lv_label_set_text(dashboard.getLabelGas(), buf);
     }
     
     if (dashboard.getLabelBrake()) {
         char buf[16];
-        sprintf(buf, "%.1f", user_brake);
+        sprintf(buf, "%.1f", canHandler.CAN.VsaStatus.USER_BRAKE);
         lv_label_set_text(dashboard.getLabelBrake(), buf);
     }
     
     if (dashboard.getLabelAccLat() && dashboard.getLabelAccLong()) {
         char lat_buf[16], long_buf[16], g_x[16], g_y[16];
-        sprintf(lat_buf, "%.2f m/s²", lat_acc);
-        sprintf(long_buf, "%.2f m/s²", long_acc);
-        sprintf(g_x, "%.2f g", lat_acc / 9.81f);
-        sprintf(g_y, "%.2f g", long_acc / 9.81f);
+        sprintf(lat_buf, "%.2f m/s²", canHandler.CAN.VehicleDynamics.LAT_ACCEL);
+        sprintf(long_buf, "%.2f m/s²", canHandler.CAN.VehicleDynamics.LONG_ACCEL);
+        sprintf(g_x, "%.2f g", canHandler.CAN.VehicleDynamics.LAT_ACCEL / 9.81f);
+        sprintf(g_y, "%.2f g", canHandler.CAN.VehicleDynamics.LONG_ACCEL / 9.81f);
         
         lv_label_set_text(dashboard.getLabelAccLat(), lat_buf);
         lv_label_set_text(dashboard.getLabelAccLong(), long_buf);
@@ -200,48 +188,49 @@ void updateDashboard() {
     // 更新传感器数据
     if (dashboard.getLabelEngineTemp()) {
         char buf[16];
-        sprintf(buf, "%d°C", engine_temp);
+        sprintf(buf, "%d°C", canHandler.CAN.EngineDataThree.ENGINE_TEMP);
         lv_label_set_text(dashboard.getLabelEngineTemp(), buf);
     }
     
     if (dashboard.getLabelIntakeTemp()) {
         char buf[16];
-        sprintf(buf, "%d°C", intake_temp);
+        sprintf(buf, "%d°C", canHandler.CAN.EngineDataThree.INTAKE_TEMP);
         lv_label_set_text(dashboard.getLabelIntakeTemp(), buf);
     }
     
     if (dashboard.getLabelFuelConsumed()) {
         char buf[16];
-        sprintf(buf, "%.1f L", fuel_consumed);
+        sprintf(buf, "%.1f L", canHandler.CAN.EngineDataThree.TRIP_FUEL_CONSUMED);
         lv_label_set_text(dashboard.getLabelFuelConsumed(), buf);
     }
     
     if (dashboard.getLabelSteerAng()) {
         char buf[16];
-        sprintf(buf, "%.1f °", steering_angle);
+        sprintf(buf, "%.1f °", canHandler.CAN.SteeringSensors.STEER_ANGLE);
         lv_label_set_text(dashboard.getLabelSteerAng(), buf);
     }
     
     if (dashboard.getLabelTripDistance()) {
         char buf[16];
-        sprintf(buf, "%d km", trip_distance);
+        sprintf(buf, "%d km", canHandler.CAN.Odometer.ODOMETER);
         lv_label_set_text(dashboard.getLabelTripDistance(), buf);
     }
     
     // 更新门状态
     dashboard.updateDoorStatus(
-        canHandler.getDoorFL(),
-        canHandler.getDoorFR(),
-        canHandler.getDoorRL(),
-        canHandler.getDoorRR(),
-        canHandler.getTrunk()
+        canHandler.CAN.DoorsStatus.DOOR_OPEN_FL,
+        canHandler.CAN.DoorsStatus.DOOR_OPEN_FR,
+        canHandler.CAN.DoorsStatus.DOOR_OPEN_RL,
+        canHandler.CAN.DoorsStatus.DOOR_OPEN_RR,
+        canHandler.CAN.DoorsStatus.TRUNK_OPEN
     );
     
     // 调试输出
-    // static uint32_t last_uart_update = 0;
-    // if (now - last_uart_update >= 100) {
-    //     last_uart_update = now;
-    // }
+    static uint32_t last_uart_update = 0;
+    if (now - last_uart_update >= 1000) {
+        Serial.printf("RPM: %d\n", canHandler.CAN.Powertrain.ENGINE_RPM);
+        last_uart_update = now;
+    }
     
     last_update = now;
 }

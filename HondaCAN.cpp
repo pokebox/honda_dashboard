@@ -11,13 +11,15 @@ bool HondaCAN::begin(/*uint32_t filter = 0xFFFFFFFF*/)
 
   twai_general_config_t g_config = TWAI_GENERAL_CONFIG_DEFAULT((gpio_num_t)TX_PIN, (gpio_num_t)RX_PIN, TWAI_MODE_NORMAL);
   twai_timing_config_t t_config = TWAI_TIMING_CONFIG_500KBITS();
-  //twai_filter_config_t f_config = TWAI_FILTER_CONFIG_ACCEPT_ALL();
+#if 1
+  twai_filter_config_t f_config = TWAI_FILTER_CONFIG_ACCEPT_ALL();
+#else
   twai_filter_config_t f_config = {
     .acceptance_code = (0x000 << 21) | (0x000 << 5),
     .acceptance_mask = ~((0x400 << 21) | (0x7ff << 5)),
     .single_filter = false
   };
-
+#endif
   if (twai_driver_install(&g_config, &t_config, &f_config) != ESP_OK)
     return false;
   if (twai_start() != ESP_OK)
