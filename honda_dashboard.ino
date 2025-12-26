@@ -11,16 +11,11 @@ DashboardUI& dashboard = DashboardUI::getInstance();
 // CAN任务函数声明
 void canTask(void *arg);
 
-#define USE_BROADCAST
-//#define USE_BLE
-
 #ifdef USE_BROADCAST
 #include "ESP32_NOW.h"
 #include "WiFi.h"
 
 #include <esp_mac.h>  // For the MAC2STR and MACSTR macros
-
-#define ESPNOW_WIFI_CHANNEL 6
 
 class ESP_NOW_Broadcast_Peer : public ESP_NOW_Peer {
 public:
@@ -34,7 +29,7 @@ public:
 
   // Function to properly initialize the ESP-NOW and register the broadcast peer
   bool begin() {
-    if (!ESP_NOW.begin() || !add()) {
+    if (!ESP_NOW.begin((const uint8_t *)ESPNOW_PMK) || !add()) {
       log_e("Failed to initialize ESP-NOW or register the broadcast peer");
       return false;
     }

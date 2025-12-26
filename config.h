@@ -19,10 +19,12 @@
 
 // 网络配置
 #define USE_BROADCAST
-#define USE_BLE
+// #define USE_BLE
 
 #ifdef USE_BROADCAST
 #define ESPNOW_WIFI_CHANNEL 6
+#define ESPNOW_PMK "your_primary_key"
+#define ESPNOW_LMK "your_local_key00"
 #endif
 
 // 颜色定义
