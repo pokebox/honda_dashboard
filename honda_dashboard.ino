@@ -1,6 +1,5 @@
 #include "config.h"
 #include "display.h"
-#include "can_handler.h"
 #include "ui_dashboard.h"
 #include "honda_data.pb-c.h"
 #include "carDataProcessor.hpp"
@@ -9,10 +8,10 @@
 
 // 全局对象引用
 DisplayManager& display = DisplayManager::getInstance();
-CanHandler& canHandler = CanHandler::getInstance();
 DashboardUI& dashboard = DashboardUI::getInstance();
+HondaCAN CAN;
 
-CarDataProcessor carProcessor(canHandler);
+CarDataProcessor carProcessor(CAN);
 
 // CAN任务函数声明
 void canTask(void *arg);
@@ -22,7 +21,7 @@ void setup() {
     Serial.println("启动本田车辆仪表...");
     
     // 初始化CAN总线
-    if (!canHandler.init()) {
+    if (!CAN.begin()) {
         Serial.println("CAN总线初始化失败!");
     }
     
@@ -70,7 +69,7 @@ void setup() {
     dashboard.create();
     
     // 获取车辆VIN并更新标题
-    String car_vin = canHandler.getVIN();
+    String car_vin = CAN.obd2RequestVIN();
     Serial.printf("车辆VIN: %s\n", car_vin.c_str());
     String title = "Honda 车辆状态监控 - " + car_vin;
     dashboard.setTitle(title.c_str());
@@ -109,7 +108,7 @@ void canTask(void *arg) {
     
     while (1) {
         // 处理CAN数据
-        canHandler.run();
+        CAN.run();
 
         carProcessor.updateData();
         CarStatus *car_data = carProcessor.getCarStatus();
@@ -150,34 +149,34 @@ void updateDashboard() {
     // 更新UI
     if (dashboard.getLabelRPM()) {
         char buf[16];
-        sprintf(buf, "%d RPM", canHandler.CAN.Powertrain.ENGINE_RPM);
+        sprintf(buf, "%d RPM", CAN.Powertrain.ENGINE_RPM);
         lv_label_set_text(dashboard.getLabelRPM(), buf);
     }
     
     if (dashboard.getLabelSpeed()) {
         char buf[16];
-        sprintf(buf, "%.1f km/h", canHandler.CAN.EngineData.XMISSION_SPEED);
+        sprintf(buf, "%.1f km/h", CAN.EngineData.XMISSION_SPEED);
         lv_label_set_text(dashboard.getLabelSpeed(), buf);
     }
     
     if (dashboard.getLabelGas()) {
         char buf[16];
-        sprintf(buf, "%d %%", map(canHandler.CAN.GasPedal2.CAR_GAS, 0, 255, 0, 100));
+        sprintf(buf, "%d %%", map(CAN.GasPedal2.CAR_GAS, 0, 255, 0, 100));
         lv_label_set_text(dashboard.getLabelGas(), buf);
     }
     
     if (dashboard.getLabelBrake()) {
         char buf[16];
-        sprintf(buf, "%.1f", canHandler.CAN.VsaStatus.USER_BRAKE);
+        sprintf(buf, "%.1f", CAN.VsaStatus.USER_BRAKE);
         lv_label_set_text(dashboard.getLabelBrake(), buf);
     }
     
     if (dashboard.getLabelAccLat() && dashboard.getLabelAccLong()) {
         char lat_buf[16], long_buf[16], g_x[16], g_y[16];
-        sprintf(lat_buf, "%.2f m/s²", canHandler.CAN.VehicleDynamics.LAT_ACCEL);
-        sprintf(long_buf, "%.2f m/s²", canHandler.CAN.VehicleDynamics.LONG_ACCEL);
-        sprintf(g_x, "%.2f g", canHandler.CAN.VehicleDynamics.LAT_ACCEL / 9.81f);
-        sprintf(g_y, "%.2f g", canHandler.CAN.VehicleDynamics.LONG_ACCEL / 9.81f);
+        sprintf(lat_buf, "%.2f m/s²", CAN.VehicleDynamics.LAT_ACCEL);
+        sprintf(long_buf, "%.2f m/s²", CAN.VehicleDynamics.LONG_ACCEL);
+        sprintf(g_x, "%.2f g", CAN.VehicleDynamics.LAT_ACCEL / 9.81f);
+        sprintf(g_y, "%.2f g", CAN.VehicleDynamics.LONG_ACCEL / 9.81f);
         
         lv_label_set_text(dashboard.getLabelAccLat(), lat_buf);
         lv_label_set_text(dashboard.getLabelAccLong(), long_buf);
@@ -188,47 +187,47 @@ void updateDashboard() {
     // 更新传感器数据
     if (dashboard.getLabelEngineTemp()) {
         char buf[16];
-        sprintf(buf, "%d°C", canHandler.CAN.EngineDataThree.ENGINE_TEMP);
+        sprintf(buf, "%d°C", CAN.EngineDataThree.ENGINE_TEMP);
         lv_label_set_text(dashboard.getLabelEngineTemp(), buf);
     }
     
     if (dashboard.getLabelIntakeTemp()) {
         char buf[16];
-        sprintf(buf, "%d°C", canHandler.CAN.EngineDataThree.INTAKE_TEMP);
+        sprintf(buf, "%d°C", CAN.EngineDataThree.INTAKE_TEMP);
         lv_label_set_text(dashboard.getLabelIntakeTemp(), buf);
     }
     
     if (dashboard.getLabelFuelConsumed()) {
         char buf[16];
-        sprintf(buf, "%.1f L", canHandler.CAN.EngineDataThree.TRIP_FUEL_CONSUMED);
+        sprintf(buf, "%.1f L", CAN.EngineDataThree.TRIP_FUEL_CONSUMED);
         lv_label_set_text(dashboard.getLabelFuelConsumed(), buf);
     }
     
     if (dashboard.getLabelSteerAng()) {
         char buf[16];
-        sprintf(buf, "%.1f °", canHandler.CAN.SteeringSensors.STEER_ANGLE);
+        sprintf(buf, "%.1f °", CAN.SteeringSensors.STEER_ANGLE);
         lv_label_set_text(dashboard.getLabelSteerAng(), buf);
     }
     
     if (dashboard.getLabelTripDistance()) {
         char buf[16];
-        sprintf(buf, "%d km", canHandler.CAN.Odometer.ODOMETER);
+        sprintf(buf, "%d km", CAN.Odometer.ODOMETER);
         lv_label_set_text(dashboard.getLabelTripDistance(), buf);
     }
     
     // 更新门状态
     dashboard.updateDoorStatus(
-        canHandler.CAN.DoorsStatus.DOOR_OPEN_FL,
-        canHandler.CAN.DoorsStatus.DOOR_OPEN_FR,
-        canHandler.CAN.DoorsStatus.DOOR_OPEN_RL,
-        canHandler.CAN.DoorsStatus.DOOR_OPEN_RR,
-        canHandler.CAN.DoorsStatus.TRUNK_OPEN
+        CAN.DoorsStatus.DOOR_OPEN_FL,
+        CAN.DoorsStatus.DOOR_OPEN_FR,
+        CAN.DoorsStatus.DOOR_OPEN_RL,
+        CAN.DoorsStatus.DOOR_OPEN_RR,
+        CAN.DoorsStatus.TRUNK_OPEN
     );
     
     // 调试输出
     static uint32_t last_uart_update = 0;
     if (now - last_uart_update >= 1000) {
-        Serial.printf("RPM: %d\n", canHandler.CAN.Powertrain.ENGINE_RPM);
+        Serial.printf("RPM: %d\n", CAN.Powertrain.ENGINE_RPM);
         last_uart_update = now;
     }
     
