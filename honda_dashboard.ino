@@ -118,15 +118,18 @@ void canTask(void *arg) {
 
         // 广播数据
 #ifdef USE_BROADCAST
-        CarStatus *car_data = carProcessor.getCarStatus();
-        size_t packed_size = car_status__get_packed_size(car_data);
+        // CarStatus *car_data = carProcessor.getCarStatus();
+        // size_t packed_size = car_status__get_packed_size(car_data);
+        ALLDATA *all_data = carProcessor.getAllData();
+        size_t packed_size = all__data__get_packed_size(all_data);
         uint8_t *data = (uint8_t*)malloc(packed_size);
         if (data == NULL) {
             Serial.println("Failed to allocate memory for packet");
             vTaskDelay(pdMS_TO_TICKS(1));
             continue;
         }
-        car_status__pack(car_data, data);
+        //car_status__pack(car_data, data);
+        all__data__pack(all_data, data);
 
         if (!broadcast_peer.send_message(data, packed_size)) {
             Serial.println("Failed to broadcast message "+ String(packed_size));

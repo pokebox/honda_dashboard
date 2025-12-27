@@ -43,6 +43,11 @@ typedef struct CruiseData CruiseData;
 typedef struct EngineData3 EngineData3;
 typedef struct DriveModes DriveModes;
 typedef struct Gearbox Gearbox;
+typedef struct PCMDATA PCMDATA;
+typedef struct VSADATA VSADATA;
+typedef struct EPSDATA EPSDATA;
+typedef struct OTHERDATA OTHERDATA;
+typedef struct ALLDATA ALLDATA;
 typedef struct CarStatus CarStatus;
 typedef struct VehicleDataBatch VehicleDataBatch;
 typedef struct CanData CanData;
@@ -942,6 +947,163 @@ struct  Gearbox
 , NULL, 0 }
 
 
+struct  PCMDATA
+{
+  ProtobufCMessage base;
+  /*
+   * 加速踏板2
+   */
+  GasPedal2 *gaspedal2;
+  /*
+   * 发动机数据
+   */
+  EngineData *enginedata;
+  /*
+   * 车身电机数据
+   */
+  PowertrainData *powertraindata;
+  /*
+   * 车速
+   */
+  CarSpeed *carspeed;
+  /*
+   * 发动机数据3
+   */
+  EngineData3 *enginedata3;
+  /*
+   * 变速箱
+   */
+  GearboxCvt *gearboxcvt;
+  /*
+   * 变速箱
+   */
+  Gearbox *gearbox;
+};
+#define PCM__DATA__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&pcm__data__descriptor) \
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL }
+
+
+struct  VSADATA
+{
+  ProtobufCMessage base;
+  /*
+   * 车辆稳定性控制系统状态
+   */
+  VsaStatus *vsastatus;
+  /*
+   * 车轮速度
+   */
+  WheelSpeeds *wheelsspeeds;
+  /*
+   * 车辆动力学数据
+   */
+  VehicleDynamics *vehicledynamics;
+  /*
+   * 粗略车轮速度
+   */
+  RoughWheelSpeed *roughwheelspeed;
+  /*
+   * 静止状态
+   */
+  Standstill *standstill;
+};
+#define VSA__DATA__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&vsa__data__descriptor) \
+, NULL, NULL, NULL, NULL, NULL }
+
+
+struct  EPSDATA
+{
+  ProtobufCMessage base;
+  /*
+   * 转向电机扭矩
+   */
+  SteerMotorTorque *steermotortorque;
+  /*
+   * 转向传感器数据
+   */
+  SteeringSensors *steeringsensors;
+};
+#define EPS__DATA__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&eps__data__descriptor) \
+, NULL, NULL }
+
+
+struct  OTHERDATA
+{
+  ProtobufCMessage base;
+  /*
+   * 电子驻车制动状态
+   */
+  EpbStatus *epbstatus;
+  /*
+   * 经济模式状态
+   */
+  EconStatus *econstatus;
+  /*
+   * 方向盘控制反馈
+   */
+  ScmFeedback *scmfeedback;
+  /*
+   * 拨杆状态
+   */
+  StalkStatus *stalkstatus;
+  /*
+   * 拨杆状态2
+   */
+  StalkStatus2 *stalkstatus2;
+  /*
+   * 车门状态
+   */
+  DoorsStatus *doorsstatus;
+  /*
+   * 里程表
+   */
+  Odometer *odometer;
+  /*
+   * 方向盘控制按钮
+   */
+  ScmButtons *scmbuttons;
+  /*
+   * 安全带状态
+   */
+  SeatbeltStatus *seatbeltstatus;
+  /*
+   * HUD设置
+   */
+  HudSetting *hudsetting;
+};
+#define OTHER__DATA__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&other__data__descriptor) \
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL }
+
+
+struct  ALLDATA
+{
+  ProtobufCMessage base;
+  /*
+   * PCM数据
+   */
+  PCMDATA *pcmdata;
+  /*
+   * VSA数据
+   */
+  VSADATA *vsadata;
+  /*
+   * EPS数据
+   */
+  EPSDATA *epsdata;
+  /*
+   * 其他数据
+   */
+  OTHERDATA *otherdata;
+};
+#define ALL__DATA__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&all__data__descriptor) \
+, NULL, NULL, NULL, NULL }
+
+
 typedef enum {
   CAR_STATUS__POWERTRAIN_DATA__NOT_SET = 0,
   CAR_STATUS__POWERTRAIN_DATA_POWERTRAIN = 380
@@ -1764,6 +1926,101 @@ Gearbox *
 void   gearbox__free_unpacked
                      (Gearbox *message,
                       ProtobufCAllocator *allocator);
+/* PCMDATA methods */
+void   pcm__data__init
+                     (PCMDATA         *message);
+size_t pcm__data__get_packed_size
+                     (const PCMDATA   *message);
+size_t pcm__data__pack
+                     (const PCMDATA   *message,
+                      uint8_t             *out);
+size_t pcm__data__pack_to_buffer
+                     (const PCMDATA   *message,
+                      ProtobufCBuffer     *buffer);
+PCMDATA *
+       pcm__data__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data);
+void   pcm__data__free_unpacked
+                     (PCMDATA *message,
+                      ProtobufCAllocator *allocator);
+/* VSADATA methods */
+void   vsa__data__init
+                     (VSADATA         *message);
+size_t vsa__data__get_packed_size
+                     (const VSADATA   *message);
+size_t vsa__data__pack
+                     (const VSADATA   *message,
+                      uint8_t             *out);
+size_t vsa__data__pack_to_buffer
+                     (const VSADATA   *message,
+                      ProtobufCBuffer     *buffer);
+VSADATA *
+       vsa__data__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data);
+void   vsa__data__free_unpacked
+                     (VSADATA *message,
+                      ProtobufCAllocator *allocator);
+/* EPSDATA methods */
+void   eps__data__init
+                     (EPSDATA         *message);
+size_t eps__data__get_packed_size
+                     (const EPSDATA   *message);
+size_t eps__data__pack
+                     (const EPSDATA   *message,
+                      uint8_t             *out);
+size_t eps__data__pack_to_buffer
+                     (const EPSDATA   *message,
+                      ProtobufCBuffer     *buffer);
+EPSDATA *
+       eps__data__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data);
+void   eps__data__free_unpacked
+                     (EPSDATA *message,
+                      ProtobufCAllocator *allocator);
+/* OTHERDATA methods */
+void   other__data__init
+                     (OTHERDATA         *message);
+size_t other__data__get_packed_size
+                     (const OTHERDATA   *message);
+size_t other__data__pack
+                     (const OTHERDATA   *message,
+                      uint8_t             *out);
+size_t other__data__pack_to_buffer
+                     (const OTHERDATA   *message,
+                      ProtobufCBuffer     *buffer);
+OTHERDATA *
+       other__data__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data);
+void   other__data__free_unpacked
+                     (OTHERDATA *message,
+                      ProtobufCAllocator *allocator);
+/* ALLDATA methods */
+void   all__data__init
+                     (ALLDATA         *message);
+size_t all__data__get_packed_size
+                     (const ALLDATA   *message);
+size_t all__data__pack
+                     (const ALLDATA   *message,
+                      uint8_t             *out);
+size_t all__data__pack_to_buffer
+                     (const ALLDATA   *message,
+                      ProtobufCBuffer     *buffer);
+ALLDATA *
+       all__data__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data);
+void   all__data__free_unpacked
+                     (ALLDATA *message,
+                      ProtobufCAllocator *allocator);
 /* CarStatus methods */
 void   car_status__init
                      (CarStatus         *message);
@@ -1907,6 +2164,21 @@ typedef void (*DriveModes_Closure)
 typedef void (*Gearbox_Closure)
                  (const Gearbox *message,
                   void *closure_data);
+typedef void (*PCMDATA_Closure)
+                 (const PCMDATA *message,
+                  void *closure_data);
+typedef void (*VSADATA_Closure)
+                 (const VSADATA *message,
+                  void *closure_data);
+typedef void (*EPSDATA_Closure)
+                 (const EPSDATA *message,
+                  void *closure_data);
+typedef void (*OTHERDATA_Closure)
+                 (const OTHERDATA *message,
+                  void *closure_data);
+typedef void (*ALLDATA_Closure)
+                 (const ALLDATA *message,
+                  void *closure_data);
 typedef void (*CarStatus_Closure)
                  (const CarStatus *message,
                   void *closure_data);
@@ -1955,6 +2227,11 @@ extern const ProtobufCMessageDescriptor cruise_data__descriptor;
 extern const ProtobufCMessageDescriptor engine_data3__descriptor;
 extern const ProtobufCMessageDescriptor drive_modes__descriptor;
 extern const ProtobufCMessageDescriptor gearbox__descriptor;
+extern const ProtobufCMessageDescriptor pcm__data__descriptor;
+extern const ProtobufCMessageDescriptor vsa__data__descriptor;
+extern const ProtobufCMessageDescriptor eps__data__descriptor;
+extern const ProtobufCMessageDescriptor other__data__descriptor;
+extern const ProtobufCMessageDescriptor all__data__descriptor;
 extern const ProtobufCMessageDescriptor car_status__descriptor;
 extern const ProtobufCMessageDescriptor vehicle_data_batch__descriptor;
 extern const ProtobufCMessageDescriptor can_data__descriptor;

@@ -1267,6 +1267,231 @@ void   gearbox__free_unpacked
   assert(message->base.descriptor == &gearbox__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
+void   pcm__data__init
+                     (PCMDATA         *message)
+{
+  static const PCMDATA init_value = PCM__DATA__INIT;
+  *message = init_value;
+}
+size_t pcm__data__get_packed_size
+                     (const PCMDATA *message)
+{
+  assert(message->base.descriptor == &pcm__data__descriptor);
+  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
+}
+size_t pcm__data__pack
+                     (const PCMDATA *message,
+                      uint8_t       *out)
+{
+  assert(message->base.descriptor == &pcm__data__descriptor);
+  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
+}
+size_t pcm__data__pack_to_buffer
+                     (const PCMDATA *message,
+                      ProtobufCBuffer *buffer)
+{
+  assert(message->base.descriptor == &pcm__data__descriptor);
+  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
+}
+PCMDATA *
+       pcm__data__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data)
+{
+  return (PCMDATA *)
+     protobuf_c_message_unpack (&pcm__data__descriptor,
+                                allocator, len, data);
+}
+void   pcm__data__free_unpacked
+                     (PCMDATA *message,
+                      ProtobufCAllocator *allocator)
+{
+  if(!message)
+    return;
+  assert(message->base.descriptor == &pcm__data__descriptor);
+  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
+}
+void   vsa__data__init
+                     (VSADATA         *message)
+{
+  static const VSADATA init_value = VSA__DATA__INIT;
+  *message = init_value;
+}
+size_t vsa__data__get_packed_size
+                     (const VSADATA *message)
+{
+  assert(message->base.descriptor == &vsa__data__descriptor);
+  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
+}
+size_t vsa__data__pack
+                     (const VSADATA *message,
+                      uint8_t       *out)
+{
+  assert(message->base.descriptor == &vsa__data__descriptor);
+  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
+}
+size_t vsa__data__pack_to_buffer
+                     (const VSADATA *message,
+                      ProtobufCBuffer *buffer)
+{
+  assert(message->base.descriptor == &vsa__data__descriptor);
+  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
+}
+VSADATA *
+       vsa__data__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data)
+{
+  return (VSADATA *)
+     protobuf_c_message_unpack (&vsa__data__descriptor,
+                                allocator, len, data);
+}
+void   vsa__data__free_unpacked
+                     (VSADATA *message,
+                      ProtobufCAllocator *allocator)
+{
+  if(!message)
+    return;
+  assert(message->base.descriptor == &vsa__data__descriptor);
+  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
+}
+void   eps__data__init
+                     (EPSDATA         *message)
+{
+  static const EPSDATA init_value = EPS__DATA__INIT;
+  *message = init_value;
+}
+size_t eps__data__get_packed_size
+                     (const EPSDATA *message)
+{
+  assert(message->base.descriptor == &eps__data__descriptor);
+  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
+}
+size_t eps__data__pack
+                     (const EPSDATA *message,
+                      uint8_t       *out)
+{
+  assert(message->base.descriptor == &eps__data__descriptor);
+  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
+}
+size_t eps__data__pack_to_buffer
+                     (const EPSDATA *message,
+                      ProtobufCBuffer *buffer)
+{
+  assert(message->base.descriptor == &eps__data__descriptor);
+  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
+}
+EPSDATA *
+       eps__data__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data)
+{
+  return (EPSDATA *)
+     protobuf_c_message_unpack (&eps__data__descriptor,
+                                allocator, len, data);
+}
+void   eps__data__free_unpacked
+                     (EPSDATA *message,
+                      ProtobufCAllocator *allocator)
+{
+  if(!message)
+    return;
+  assert(message->base.descriptor == &eps__data__descriptor);
+  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
+}
+void   other__data__init
+                     (OTHERDATA         *message)
+{
+  static const OTHERDATA init_value = OTHER__DATA__INIT;
+  *message = init_value;
+}
+size_t other__data__get_packed_size
+                     (const OTHERDATA *message)
+{
+  assert(message->base.descriptor == &other__data__descriptor);
+  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
+}
+size_t other__data__pack
+                     (const OTHERDATA *message,
+                      uint8_t       *out)
+{
+  assert(message->base.descriptor == &other__data__descriptor);
+  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
+}
+size_t other__data__pack_to_buffer
+                     (const OTHERDATA *message,
+                      ProtobufCBuffer *buffer)
+{
+  assert(message->base.descriptor == &other__data__descriptor);
+  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
+}
+OTHERDATA *
+       other__data__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data)
+{
+  return (OTHERDATA *)
+     protobuf_c_message_unpack (&other__data__descriptor,
+                                allocator, len, data);
+}
+void   other__data__free_unpacked
+                     (OTHERDATA *message,
+                      ProtobufCAllocator *allocator)
+{
+  if(!message)
+    return;
+  assert(message->base.descriptor == &other__data__descriptor);
+  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
+}
+void   all__data__init
+                     (ALLDATA         *message)
+{
+  static const ALLDATA init_value = ALL__DATA__INIT;
+  *message = init_value;
+}
+size_t all__data__get_packed_size
+                     (const ALLDATA *message)
+{
+  assert(message->base.descriptor == &all__data__descriptor);
+  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
+}
+size_t all__data__pack
+                     (const ALLDATA *message,
+                      uint8_t       *out)
+{
+  assert(message->base.descriptor == &all__data__descriptor);
+  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
+}
+size_t all__data__pack_to_buffer
+                     (const ALLDATA *message,
+                      ProtobufCBuffer *buffer)
+{
+  assert(message->base.descriptor == &all__data__descriptor);
+  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
+}
+ALLDATA *
+       all__data__unpack
+                     (ProtobufCAllocator  *allocator,
+                      size_t               len,
+                      const uint8_t       *data)
+{
+  return (ALLDATA *)
+     protobuf_c_message_unpack (&all__data__descriptor,
+                                allocator, len, data);
+}
+void   all__data__free_unpacked
+                     (ALLDATA *message,
+                      ProtobufCAllocator *allocator)
+{
+  if(!message)
+    return;
+  assert(message->base.descriptor == &all__data__descriptor);
+  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
+}
 void   car_status__init
                      (CarStatus         *message)
 {
@@ -3985,6 +4210,515 @@ const ProtobufCMessageDescriptor gearbox__descriptor =
   gearbox__field_indices_by_name,
   1,  gearbox__number_ranges,
   (ProtobufCMessageInit) gearbox__init,
+  NULL,NULL,NULL    /* reserved[123] */
+};
+static const ProtobufCFieldDescriptor pcm__data__field_descriptors[7] =
+{
+  {
+    "gearbox",
+    300,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(PCMDATA, gearbox),
+    &gearbox__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "gasPedal2",
+    304,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(PCMDATA, gaspedal2),
+    &gas_pedal2__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "engineData",
+    344,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(PCMDATA, enginedata),
+    &engine_data__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "powertrainData",
+    380,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(PCMDATA, powertraindata),
+    &powertrain_data__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "gearboxCvt",
+    401,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(PCMDATA, gearboxcvt),
+    &gearbox_cvt__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "carSpeed",
+    777,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(PCMDATA, carspeed),
+    &car_speed__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "engineData3",
+    804,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(PCMDATA, enginedata3),
+    &engine_data3__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+};
+static const unsigned pcm__data__field_indices_by_name[] = {
+  5,   /* field[5] = carSpeed */
+  2,   /* field[2] = engineData */
+  6,   /* field[6] = engineData3 */
+  1,   /* field[1] = gasPedal2 */
+  0,   /* field[0] = gearbox */
+  4,   /* field[4] = gearboxCvt */
+  3,   /* field[3] = powertrainData */
+};
+static const ProtobufCIntRange pcm__data__number_ranges[7 + 1] =
+{
+  { 300, 0 },
+  { 304, 1 },
+  { 344, 2 },
+  { 380, 3 },
+  { 401, 4 },
+  { 777, 5 },
+  { 804, 6 },
+  { 0, 7 }
+};
+const ProtobufCMessageDescriptor pcm__data__descriptor =
+{
+  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
+  "PCM_DATA",
+  "PCMDATA",
+  "PCMDATA",
+  "",
+  sizeof(PCMDATA),
+  7,
+  pcm__data__field_descriptors,
+  pcm__data__field_indices_by_name,
+  7,  pcm__data__number_ranges,
+  (ProtobufCMessageInit) pcm__data__init,
+  NULL,NULL,NULL    /* reserved[123] */
+};
+static const ProtobufCFieldDescriptor vsa__data__field_descriptors[5] =
+{
+  {
+    "vsaStatus",
+    420,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(VSADATA, vsastatus),
+    &vsa_status__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "standstill",
+    432,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(VSADATA, standstill),
+    &standstill__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "wheelsSpeeds",
+    464,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(VSADATA, wheelsspeeds),
+    &wheel_speeds__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "vehicleDynamics",
+    490,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(VSADATA, vehicledynamics),
+    &vehicle_dynamics__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "roughWheelSpeed",
+    597,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(VSADATA, roughwheelspeed),
+    &rough_wheel_speed__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+};
+static const unsigned vsa__data__field_indices_by_name[] = {
+  4,   /* field[4] = roughWheelSpeed */
+  1,   /* field[1] = standstill */
+  3,   /* field[3] = vehicleDynamics */
+  0,   /* field[0] = vsaStatus */
+  2,   /* field[2] = wheelsSpeeds */
+};
+static const ProtobufCIntRange vsa__data__number_ranges[5 + 1] =
+{
+  { 420, 0 },
+  { 432, 1 },
+  { 464, 2 },
+  { 490, 3 },
+  { 597, 4 },
+  { 0, 5 }
+};
+const ProtobufCMessageDescriptor vsa__data__descriptor =
+{
+  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
+  "VSA_DATA",
+  "VSADATA",
+  "VSADATA",
+  "",
+  sizeof(VSADATA),
+  5,
+  vsa__data__field_descriptors,
+  vsa__data__field_indices_by_name,
+  5,  vsa__data__number_ranges,
+  (ProtobufCMessageInit) vsa__data__init,
+  NULL,NULL,NULL    /* reserved[123] */
+};
+static const ProtobufCFieldDescriptor eps__data__field_descriptors[2] =
+{
+  {
+    "steeringSensors",
+    330,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(EPSDATA, steeringsensors),
+    &steering_sensors__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "steerMotorTorque",
+    427,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(EPSDATA, steermotortorque),
+    &steer_motor_torque__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+};
+static const unsigned eps__data__field_indices_by_name[] = {
+  1,   /* field[1] = steerMotorTorque */
+  0,   /* field[0] = steeringSensors */
+};
+static const ProtobufCIntRange eps__data__number_ranges[2 + 1] =
+{
+  { 330, 0 },
+  { 427, 1 },
+  { 0, 2 }
+};
+const ProtobufCMessageDescriptor eps__data__descriptor =
+{
+  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
+  "EPS_DATA",
+  "EPSDATA",
+  "EPSDATA",
+  "",
+  sizeof(EPSDATA),
+  2,
+  eps__data__field_descriptors,
+  eps__data__field_indices_by_name,
+  2,  eps__data__number_ranges,
+  (ProtobufCMessageInit) eps__data__init,
+  NULL,NULL,NULL    /* reserved[123] */
+};
+static const ProtobufCFieldDescriptor other__data__field_descriptors[10] =
+{
+  {
+    "epbStatus",
+    450,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(OTHERDATA, epbstatus),
+    &epb_status__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "hudSetting",
+    493,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(OTHERDATA, hudsetting),
+    &hud_setting__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "econStatus",
+    545,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(OTHERDATA, econstatus),
+    &econ_status__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "scmButtons",
+    662,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(OTHERDATA, scmbuttons),
+    &scm_buttons__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "seatbeltStatus",
+    773,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(OTHERDATA, seatbeltstatus),
+    &seatbelt_status__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "scmFeedback",
+    806,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(OTHERDATA, scmfeedback),
+    &scm_feedback__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "stalkStatus",
+    884,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(OTHERDATA, stalkstatus),
+    &stalk_status__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "stalkStatus2",
+    891,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(OTHERDATA, stalkstatus2),
+    &stalk_status2__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "doorsStatus",
+    1029,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(OTHERDATA, doorsstatus),
+    &doors_status__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "odometer",
+    1302,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(OTHERDATA, odometer),
+    &odometer__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+};
+static const unsigned other__data__field_indices_by_name[] = {
+  8,   /* field[8] = doorsStatus */
+  2,   /* field[2] = econStatus */
+  0,   /* field[0] = epbStatus */
+  1,   /* field[1] = hudSetting */
+  9,   /* field[9] = odometer */
+  3,   /* field[3] = scmButtons */
+  5,   /* field[5] = scmFeedback */
+  4,   /* field[4] = seatbeltStatus */
+  6,   /* field[6] = stalkStatus */
+  7,   /* field[7] = stalkStatus2 */
+};
+static const ProtobufCIntRange other__data__number_ranges[10 + 1] =
+{
+  { 450, 0 },
+  { 493, 1 },
+  { 545, 2 },
+  { 662, 3 },
+  { 773, 4 },
+  { 806, 5 },
+  { 884, 6 },
+  { 891, 7 },
+  { 1029, 8 },
+  { 1302, 9 },
+  { 0, 10 }
+};
+const ProtobufCMessageDescriptor other__data__descriptor =
+{
+  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
+  "OTHER_DATA",
+  "OTHERDATA",
+  "OTHERDATA",
+  "",
+  sizeof(OTHERDATA),
+  10,
+  other__data__field_descriptors,
+  other__data__field_indices_by_name,
+  10,  other__data__number_ranges,
+  (ProtobufCMessageInit) other__data__init,
+  NULL,NULL,NULL    /* reserved[123] */
+};
+static const ProtobufCFieldDescriptor all__data__field_descriptors[4] =
+{
+  {
+    "pcmData",
+    2,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(ALLDATA, pcmdata),
+    &pcm__data__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "vsaData",
+    3,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(ALLDATA, vsadata),
+    &vsa__data__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "epsData",
+    4,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(ALLDATA, epsdata),
+    &eps__data__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "otherData",
+    5,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_MESSAGE,
+    0,   /* quantifier_offset */
+    offsetof(ALLDATA, otherdata),
+    &other__data__descriptor,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+};
+static const unsigned all__data__field_indices_by_name[] = {
+  2,   /* field[2] = epsData */
+  3,   /* field[3] = otherData */
+  0,   /* field[0] = pcmData */
+  1,   /* field[1] = vsaData */
+};
+static const ProtobufCIntRange all__data__number_ranges[1 + 1] =
+{
+  { 2, 0 },
+  { 0, 4 }
+};
+const ProtobufCMessageDescriptor all__data__descriptor =
+{
+  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
+  "ALL_DATA",
+  "ALLDATA",
+  "ALLDATA",
+  "",
+  sizeof(ALLDATA),
+  4,
+  all__data__field_descriptors,
+  all__data__field_indices_by_name,
+  1,  all__data__number_ranges,
+  (ProtobufCMessageInit) all__data__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
 static const ProtobufCFieldDescriptor car_status__field_descriptors[25] =

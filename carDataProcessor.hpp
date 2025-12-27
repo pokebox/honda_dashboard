@@ -3,8 +3,15 @@
 
 class CarDataProcessor {
 private:
+    HondaCAN& CAN;
     //static MessageHeader msg_header;
     CarStatus car_data;
+    PCMDATA pcm_data;
+    VSADATA vsa_data;
+    EPSDATA eps_data;
+    OTHERDATA other_data;
+    ALLDATA all_data;
+
     PowertrainData powertrain_data;
     EngineData engine_data;
     GasPedal2 gas_pedal2;
@@ -27,11 +34,16 @@ private:
     DoorsStatus doors_status;
     Odometer odometer;
     EngineData3 engine_data3;
-    HondaCAN& CAN;
 public:
     CarDataProcessor(HondaCAN& handler) : CAN(handler) {
         // msg_header = MESSAGE_HEADER__INIT;
         car_data = CAR_STATUS__INIT;
+        pcm_data = PCM__DATA__INIT;
+        vsa_data = VSA__DATA__INIT;
+        eps_data = EPS__DATA__INIT;
+        other_data = OTHER__DATA__INIT;
+        all_data = ALL__DATA__INIT;
+
         powertrain_data = POWERTRAIN_DATA__INIT;
         engine_data = ENGINE_DATA__INIT;
         gas_pedal2 = GAS_PEDAL2__INIT;
@@ -81,6 +93,36 @@ public:
         car_data.doors_status_data_case = CAR_STATUS__DOORS_STATUS_DATA_DOORS_STATUS;
         car_data.odometer_data_case = CAR_STATUS__ODOMETER_DATA_ODOMETER;
         car_data.engine_data_3_case = CAR_STATUS__ENGINE_DATA_3_ENGINE_DATA3;
+
+        pcm_data.gaspedal2 = &gas_pedal2;
+        pcm_data.enginedata3 = &engine_data3;
+        pcm_data.powertraindata = &powertrain_data;
+        pcm_data.carspeed = &car_speed;
+        pcm_data.enginedata3 = &engine_data3;
+
+        vsa_data.vsastatus = &vsa_status;
+        vsa_data.wheelsspeeds = &wheel_speeds;
+        vsa_data.vehicledynamics = &vehicle_dynamics;
+        vsa_data.roughwheelspeed = &rough_wheel_speed;
+        vsa_data.standstill = &standstill;
+
+        eps_data.steeringsensors = &steering_sensors;
+        eps_data.steermotortorque = &steer_motor_torque;
+
+        other_data.epbstatus = &epb_status;
+        other_data.econstatus = &econ_status;
+        other_data.scmfeedback = &scm_feedback;
+        other_data.stalkstatus = &stalk_status;
+        other_data.stalkstatus2 = &stalk_status2;
+        other_data.doorsstatus = &doors_status;
+        other_data.odometer = &odometer;
+        other_data.scmbuttons = &scm_buttons;
+        other_data.seatbeltstatus = &seatbelt_status;
+
+        all_data.pcmdata = &pcm_data;
+        all_data.vsadata = &vsa_data;
+        all_data.epsdata = &eps_data;
+        all_data.otherdata = &other_data;
         
         // 设置实际的指针字段
         car_data.powertrain = &powertrain_data;
@@ -229,5 +271,21 @@ public:
 
     CarStatus *getCarStatus() {
         return &car_data;
+    }
+
+    PCMDATA *getPcmData() {
+        return &pcm_data;
+    }
+    VSADATA *getVsaData() {
+        return &vsa_data;
+    }
+    EPSDATA *getEpsData() {
+        return &eps_data;
+    }
+    OTHERDATA *getOtherData() {
+        return &other_data;
+    }
+    ALLDATA *getAllData() {
+        return &all_data;
     }
 };

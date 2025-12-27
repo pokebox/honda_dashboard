@@ -339,6 +339,50 @@ message Gearbox {
 
 // ==================== 聚合消息 ====================
 
+message PCM_DATA {
+  GasPedal2 gasPedal2 = 304;  // 加速踏板2
+  EngineData engineData = 344;  // 发动机数据
+  PowertrainData powertrainData = 380;  // 车身电机数据
+  CarSpeed carSpeed = 777;  // 车速
+  EngineData3 engineData3 = 804;  // 发动机数据3
+  GearboxCvt gearboxCvt = 401;  // 变速箱
+  Gearbox gearbox = 300;  // 变速箱
+}
+
+message VSA_DATA {
+  VsaStatus vsaStatus = 420;  // 车辆稳定性控制系统状态
+  WheelSpeeds wheelsSpeeds = 464;  // 车轮速度
+  VehicleDynamics vehicleDynamics = 490;  // 车辆动力学数据
+  RoughWheelSpeed roughWheelSpeed = 597;  // 粗略车轮速度
+  Standstill standstill = 432;  // 静止状态
+  // BRAKE_PRESSURE
+}
+
+message EPS_DATA {
+  SteerMotorTorque steerMotorTorque = 427;  // 转向电机扭矩
+  SteeringSensors steeringSensors = 330;  // 转向传感器数据
+}
+
+message OTHER_DATA {
+  EpbStatus epbStatus = 450;  // 电子驻车制动状态
+  EconStatus econStatus = 545;  // 经济模式状态
+  ScmFeedback scmFeedback = 806;  // 方向盘控制反馈
+  StalkStatus stalkStatus = 884;  // 拨杆状态
+  StalkStatus2 stalkStatus2 = 891;  // 拨杆状态2
+  DoorsStatus doorsStatus = 1029;  // 车门状态
+  Odometer odometer = 1302;  // 里程表
+  ScmButtons scmButtons = 662;  // 方向盘控制按钮
+  SeatbeltStatus seatbeltStatus = 773;  // 安全带状态
+  HudSetting hudSetting = 493;  // HUD设置
+}
+
+message ALL_DATA {
+  PCM_DATA pcmData = 2;  // PCM数据
+  VSA_DATA vsaData = 3;  // VSA数据
+  EPS_DATA epsData = 4;  // EPS数据
+  OTHER_DATA otherData = 5;  // 其他数据
+}
+
 // 车辆状态聚合消息，包含所有数据
 message CarStatus {
   //google.protobuf.Timestamp timestamp = 1;

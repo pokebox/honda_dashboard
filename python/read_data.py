@@ -9,8 +9,10 @@ while True:
     try:
         data = ser.read_all()
         if len(data) > 0:
-            pb_data = honda_data_pb2.CarStatus()
+            pb_data = honda_data_pb2.ALL_DATA()
             pb_data.ParseFromString(data)
+            print(pb_data.pcmData.gasPedal2.car_gas)
+            
             print(pb_data)
         else:
             time.sleep(0.1)
