@@ -1,2 +1,6 @@
 .vscode/
+.venv/
+build/
+dist/
+*.py[cod]
 *.txt

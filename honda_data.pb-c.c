@@ -4010,7 +4010,7 @@ static const ProtobufCFieldDescriptor car_status__field_descriptors[25] =
     offsetof(CarStatus, kinematicsalt),
     &kinematics_alt__descriptor,
     NULL,
-    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
@@ -4022,7 +4022,7 @@ static const ProtobufCFieldDescriptor car_status__field_descriptors[25] =
     offsetof(CarStatus, gaspedal2),
     &gas_pedal2__descriptor,
     NULL,
-    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
@@ -4034,7 +4034,7 @@ static const ProtobufCFieldDescriptor car_status__field_descriptors[25] =
     offsetof(CarStatus, steeringsensors),
     &steering_sensors__descriptor,
     NULL,
-    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
@@ -4046,7 +4046,7 @@ static const ProtobufCFieldDescriptor car_status__field_descriptors[25] =
     offsetof(CarStatus, engine),
     &engine_data__descriptor,
     NULL,
-    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
@@ -4058,7 +4058,7 @@ static const ProtobufCFieldDescriptor car_status__field_descriptors[25] =
     offsetof(CarStatus, powertrain),
     &powertrain_data__descriptor,
     NULL,
-    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
@@ -4070,7 +4070,7 @@ static const ProtobufCFieldDescriptor car_status__field_descriptors[25] =
     offsetof(CarStatus, gearboxcvt),
     &gearbox_cvt__descriptor,
     NULL,
-    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
@@ -4082,7 +4082,7 @@ static const ProtobufCFieldDescriptor car_status__field_descriptors[25] =
     offsetof(CarStatus, vsastatus),
     &vsa_status__descriptor,
     NULL,
-    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
@@ -4094,7 +4094,7 @@ static const ProtobufCFieldDescriptor car_status__field_descriptors[25] =
     offsetof(CarStatus, steermotortorque),
     &steer_motor_torque__descriptor,
     NULL,
-    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
@@ -4106,7 +4106,7 @@ static const ProtobufCFieldDescriptor car_status__field_descriptors[25] =
     offsetof(CarStatus, standstill),
     &standstill__descriptor,
     NULL,
-    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
@@ -4118,7 +4118,7 @@ static const ProtobufCFieldDescriptor car_status__field_descriptors[25] =
     offsetof(CarStatus, epbstatus),
     &epb_status__descriptor,
     NULL,
-    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
@@ -4130,7 +4130,7 @@ static const ProtobufCFieldDescriptor car_status__field_descriptors[25] =
     offsetof(CarStatus, wheelsspeeds),
     &wheel_speeds__descriptor,
     NULL,
-    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
@@ -4142,7 +4142,7 @@ static const ProtobufCFieldDescriptor car_status__field_descriptors[25] =
     offsetof(CarStatus, dynamics),
     &vehicle_dynamics__descriptor,
     NULL,
-    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
@@ -4154,7 +4154,7 @@ static const ProtobufCFieldDescriptor car_status__field_descriptors[25] =
     offsetof(CarStatus, hudsetting),
     &hud_setting__descriptor,
     NULL,
-    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
@@ -4166,7 +4166,7 @@ static const ProtobufCFieldDescriptor car_status__field_descriptors[25] =
     offsetof(CarStatus, econstatus),
     &econ_status__descriptor,
     NULL,
-    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
@@ -4178,7 +4178,7 @@ static const ProtobufCFieldDescriptor car_status__field_descriptors[25] =
     offsetof(CarStatus, roughwheelspeed),
     &rough_wheel_speed__descriptor,
     NULL,
-    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
@@ -4190,7 +4190,7 @@ static const ProtobufCFieldDescriptor car_status__field_descriptors[25] =
     offsetof(CarStatus, scmbuttons),
     &scm_buttons__descriptor,
     NULL,
-    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
@@ -4202,7 +4202,7 @@ static const ProtobufCFieldDescriptor car_status__field_descriptors[25] =
     offsetof(CarStatus, seatbeltstatus),
     &seatbelt_status__descriptor,
     NULL,
-    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
@@ -4214,7 +4214,7 @@ static const ProtobufCFieldDescriptor car_status__field_descriptors[25] =
     offsetof(CarStatus, carspeed),
     &car_speed__descriptor,
     NULL,
-    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
@@ -4226,7 +4226,7 @@ static const ProtobufCFieldDescriptor car_status__field_descriptors[25] =
     offsetof(CarStatus, enginedata3),
     &engine_data3__descriptor,
     NULL,
-    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
@@ -4238,7 +4238,7 @@ static const ProtobufCFieldDescriptor car_status__field_descriptors[25] =
     offsetof(CarStatus, scmfeedback),
     &scm_feedback__descriptor,
     NULL,
-    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
@@ -4250,7 +4250,7 @@ static const ProtobufCFieldDescriptor car_status__field_descriptors[25] =
     offsetof(CarStatus, stalkstatus),
     &stalk_status__descriptor,
     NULL,
-    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
@@ -4262,7 +4262,7 @@ static const ProtobufCFieldDescriptor car_status__field_descriptors[25] =
     offsetof(CarStatus, stalkstatus2),
     &stalk_status2__descriptor,
     NULL,
-    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
@@ -4274,7 +4274,7 @@ static const ProtobufCFieldDescriptor car_status__field_descriptors[25] =
     offsetof(CarStatus, doorsstatus),
     &doors_status__descriptor,
     NULL,
-    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
@@ -4286,7 +4286,7 @@ static const ProtobufCFieldDescriptor car_status__field_descriptors[25] =
     offsetof(CarStatus, odometer),
     &odometer__descriptor,
     NULL,
-    0 | PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
+    PROTOBUF_C_FIELD_FLAG_ONEOF,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
 };

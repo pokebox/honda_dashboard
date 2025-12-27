@@ -12,12 +12,13 @@ public:
     void run();
     float obd2Request(uint8_t pid);
     String obd2RequestVIN();    // 请求VIN
-    
-    int LED_EN = 13;        // LED使能引脚
-    int RX_PIN = 2;         // CAN接收引脚
-    int TX_PIN = 1;         // CAN发送引脚
-    int CAN_RS = 3;         // CAN速率选择引脚（LOW=高速模式，HIGH=低功耗监听模式）
-    int SENSE_V_ANA = 35;   // 电压检测模拟输入引脚
+
+    uint32_t updateTime = 0;    // 最近一次更新时间戳
+    const int LED_EN = 13;        // LED使能引脚
+    const int RX_PIN = 2;         // CAN接收引脚
+    const int TX_PIN = 1;         // CAN发送引脚
+    const int CAN_RS = 3;         // CAN速率选择引脚（LOW=高速模式，HIGH=低功耗监听模式）
+    const int SENSE_V_ANA = 35;   // 电压检测模拟输入引脚
     int CAN_BIT = 11;       // CAN帧标识符位数（11位或29位）
 
     // ================== 公开的数据结构 ==================

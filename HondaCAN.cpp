@@ -30,88 +30,118 @@ bool HondaCAN::begin(/*uint32_t filter = 0xFFFFFFFF*/)
 void HondaCAN::run()
 {
   twai_message_t message;
+  bool updated = false;
   if (twai_receive(&message, pdMS_TO_TICKS(10)) == ESP_OK)
   {
     switch (message.identifier)
     {
     case POWERTRAIN_DATA_ID:
       this->parsePowertrainData(message.data);
+      updated = true;
       break;
     case CAR_SPEED_ID:
       this->parseCarSpeed(message.data);
+      updated = true;
       break;
     case VSA_STATUS_ID:
       this->parseVsaStatus(message.data);
+      updated = true;
       break;
     case ENGINE_DATA_ID:
       this->parseEngineData(message.data);
+      updated = true;
       break;
     case DOORS_STATUS_ID:
       this->parseDoorsStatus(message.data);
+      updated = true;
       break;
     case GAS_PEDAL_2_ID:
       this->parseGasPedal2(message.data);
+      updated = true;
       break;
     case STEERING_SENSORS_ID:
       this->parseSteeringSensors(message.data);
+      updated = true;
       break;
     case KINEMATICS_ALT_ID:
       this->parseKinematicsAlt(message.data);
+      updated = true;
       break;
     case STANDSTILL_ID:
       this->parseStandstill(message.data);
+      updated = true;
       break;
     case WHEEL_SPEEDS_ID:
       this->parseWheelSpeeds(message.data);
+      updated = true;
       break;
     case VEHICLE_DYNAMICS_ID:
       this->parseVehicleDynamics(message.data);
+      updated = true;
       break;
     case STEER_MOTOR_TORQUE_ID:
       this->parseSteerMotorTorque(message.data);
+      updated = true;
       break;
     case EPB_STATUS_ID:
       this->parseEpbStatus(message.data);
+      updated = true;
       break;
     case ECON_STATUS_ID:
       this->parseEconStatus(message.data);
       this->parseDriveModes(message.data);
+      updated = true;
       break;
     case ROUGH_WHEEL_SPEED_ID:
       this->parseRoughWheelSpeed(message.data);
+      updated = true;
       break;
     case SCM_BUTTONS_ID:
       this->parseScmButtons(message.data);
+      updated = true;
       break;
     case SEATBELT_STATUS_ID:
       this->parseSeatbeltStatus(message.data);
+      updated = true;
       break;
     case SCM_FEEDBACK_ID:
       this->parseScmFeedback(message.data);
+      updated = true;
       break;
     case STALK_STATUS_ID:
       this->parseStalkStatus(message.data);
+      updated = true;
       break;
     case STALK_STATUS_2_ID:
       this->parseStalkStatus2(message.data);
+      updated = true;
       break;
     case ODOMETER_ID:
       this->parseOdometer(message.data);
+      updated = true;
       break;
     case GEARBOX_CVT_ID:
       this->parseGearboxCvt(message.data);
+      updated = true;
       break;
     case GEARBOX_ID:
       this->parseGearbox(message.data);
+      updated = true;
       break;
     case HUD_SETTING_ID:
       this->parseHudSetting(message.data);
+      updated = true;
       break;
     case CRUISE_ID:
       this->parseCruiseData(message.data);
       this->parseEngineData3(message.data);
+      updated = true;
       break;
     }
+  }
+  if (updated)
+  {
+    updateTime = millis();
   }
 }
 

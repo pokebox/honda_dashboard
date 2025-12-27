@@ -105,12 +105,19 @@ void loop() {
 
 void canTask(void *arg) {
     Serial.println("CAN任务启动，运行在Core " + String(xPortGetCoreID()));
-    
+    uint32_t last_can_update = 0;
     while (1) {
         // 处理CAN数据
         CAN.run();
 
+        if (CAN.updateTime == last_can_update) {
+            vTaskDelay(pdMS_TO_TICKS(1));
+            continue;
+        }
         carProcessor.updateData();
+
+        // 广播数据
+#ifdef USE_BROADCAST
         CarStatus *car_data = carProcessor.getCarStatus();
         size_t packed_size = car_status__get_packed_size(car_data);
         uint8_t *data = (uint8_t*)malloc(packed_size);
@@ -119,18 +126,15 @@ void canTask(void *arg) {
             vTaskDelay(pdMS_TO_TICKS(1));
             continue;
         }
-
         car_status__pack(car_data, data);
 
-        // 广播数据
-#ifdef USE_BROADCAST
         if (!broadcast_peer.send_message(data, packed_size)) {
             Serial.println("Failed to broadcast message "+ String(packed_size));
         }
-#endif
-
         // 释放缓冲区
         free(data);
+#endif
+        last_can_update = CAN.updateTime;
         
         vTaskDelay(pdMS_TO_TICKS(1));
     }
@@ -199,7 +203,7 @@ void updateDashboard() {
     
     if (dashboard.getLabelFuelConsumed()) {
         char buf[16];
-        sprintf(buf, "%.1f L", CAN.EngineDataThree.TRIP_FUEL_CONSUMED);
+        sprintf(buf, "%.2f L", CAN.EngineDataThree.TRIP_FUEL_CONSUMED);
         lv_label_set_text(dashboard.getLabelFuelConsumed(), buf);
     }
     
