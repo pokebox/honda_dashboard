@@ -142,7 +142,73 @@ void HondaCAN::run()
   if (updated)
   {
     updateTime = millis();
+    int gear = calculateHondaCivicGear(EngineData.ENGINE_RPM, EngineData.XMISSION_SPEED);
+    if (gear <= 0) {
+      gear = 0;
+    }
+    Gearbox.GEAR_SHIFTER = gear;
   }
+}
+
+
+/**
+ * @brief 根据发动机转速和车速计算本田思域6MT的估计档位
+ * @param rpm 发动机转速，单位：转/分钟 (RPM)
+ * @param speed_kph 车速，单位：公里/小时 (km/h)
+ * @return int 估计的档位 (1-6)。返回0表示车速或转速为0，返回-1表示计算出的传动比异常或不在正常行车范围。
+ */
+int calculateHondaCivicGear(int rpm, double speed_kph) {
+    // -------- 核心参数配置 (需根据实车数据校准) --------
+    // 主减速器最终传动比 (示例值，思域常见范围约为3.5-4.2)
+    const double FINAL_DRIVE_RATIO = 4.105;
+    // 轮胎滚动半径 (示例值，对应思域215/55 R16轮胎，单位：米)
+    const double TIRE_RADIUS_M = 0.315;
+    // 变速箱各档位传动比 (示例值，基于典型6MT分布及思域6挡巡航数据估算[citation:1])
+    const double GEAR_RATIOS[] = {3.642, 2.08, 1.361, 1.023, 0.829, 0.686}; // 1-6档
+    const int NUM_GEARS = sizeof(GEAR_RATIOS) / sizeof(GEAR_RATIOS[0]);
+
+    // -------- 1. 输入有效性检查 --------
+    if (rpm <= 0 || speed_kph <= 0) {
+        return 0; // 车辆未移动或发动机未工作
+    }
+
+    // -------- 2. 计算当前总传动比 --------
+    // 将车速从 km/h 转换为 m/s
+    double speed_mps = speed_kph * 1000.0 / 3600.0;
+    // 计算车轮转速 (转/秒)，再转换为转/分钟 (RPM)
+    double wheel_rpm = (speed_mps / (2 * PI * TIRE_RADIUS_M)) * 60.0;
+    // 避免除以零
+    if (wheel_rpm <= 0) {
+        return -1;
+    }
+    // 总传动比 = 发动机转速 / 车轮转速
+    double current_total_ratio = rpm / wheel_rpm;
+
+    // -------- 3. 推算变速箱档位传动比 --------
+    // 变速箱传动比 = 总传动比 / 主减速比
+    double current_gear_ratio = current_total_ratio / FINAL_DRIVE_RATIO;
+
+    // -------- 4. 匹配最接近的档位 --------
+    int estimated_gear = -1;
+    double min_ratio_diff = 1e6; // 初始化为一个大数
+
+    for (int i = 0; i < NUM_GEARS; i++) {
+        double diff = fabs(current_gear_ratio - GEAR_RATIOS[i]);
+        // 找到与当前计算值最接近的标定传动比
+        if (diff < min_ratio_diff) {
+            min_ratio_diff = diff;
+            estimated_gear = i + 1; // 数组索引0对应1档
+        }
+    }
+
+    // -------- 5. 置信度检查 --------
+    // 如果计算出的传动比与匹配档位的标定值差异过大，则认为结果不可信
+    double allowed_error = 0.25; // 允许的误差容限，可根据实际情况调整
+    if (min_ratio_diff > allowed_error) {
+        return -1; // 传动比异常，可能处于空档、离合器踩下或滑行状态
+    }
+
+    return estimated_gear;
 }
 
 // ================== 解析函数实现 ==================

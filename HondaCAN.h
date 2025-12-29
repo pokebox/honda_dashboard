@@ -4,6 +4,7 @@
 #include "Const.h"
 #include "PIDS.h"
 
+int calculateHondaCivicGear(int rpm, double speed_kph);
 class HondaCAN
 {
 public:
