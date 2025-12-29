@@ -95,7 +95,7 @@ public:
         car_data.engine_data_3_case = CAR_STATUS__ENGINE_DATA_3_ENGINE_DATA3;
 
         pcm_data.gaspedal2 = &gas_pedal2;
-        pcm_data.enginedata3 = &engine_data3;
+        pcm_data.enginedata = &engine_data;
         pcm_data.powertraindata = &powertrain_data;
         pcm_data.carspeed = &car_speed;
         pcm_data.enginedata3 = &engine_data3;
