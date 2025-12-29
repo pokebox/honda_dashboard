@@ -34,6 +34,7 @@ private:
     DoorsStatus doors_status;
     Odometer odometer;
     EngineData3 engine_data3;
+    Gearbox gearbox;
 public:
     CarDataProcessor(HondaCAN& handler) : CAN(handler) {
         // msg_header = MESSAGE_HEADER__INIT;
@@ -66,6 +67,7 @@ public:
         doors_status = DOORS_STATUS__INIT;
         odometer = ODOMETER__INIT;
         engine_data3 = ENGINE_DATA3__INIT;
+        gearbox = GEARBOX__INIT;
         setupCarStatusPointers();
     }
 
@@ -99,6 +101,7 @@ public:
         pcm_data.powertraindata = &powertrain_data;
         pcm_data.carspeed = &car_speed;
         pcm_data.enginedata3 = &engine_data3;
+        pcm_data.gearbox = &gearbox;
 
         vsa_data.vsastatus = &vsa_status;
         vsa_data.wheelsspeeds = &wheel_speeds;
@@ -267,6 +270,8 @@ public:
         engine_data3.engine_temp = CAN.EngineDataThree.ENGINE_TEMP;
         engine_data3.intake_temp = CAN.EngineDataThree.INTAKE_TEMP;
         engine_data3.trip_fuel_consumed = CAN.EngineDataThree.TRIP_FUEL_CONSUMED;
+
+        gearbox.gear_shifter = CAN.Gearbox.GEAR_SHIFTER;
     }
 
     CarStatus *getCarStatus() {

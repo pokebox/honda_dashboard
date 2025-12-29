@@ -81,11 +81,11 @@ void loop() {
     static uint32_t last_tick = 0;
     uint32_t now = millis();
     
-    // 更新LVGL tick
-    if (now - last_tick >= 5) {
-        lv_tick_inc(5);
-        last_tick = now;
-    }
+    // // 更新LVGL tick
+    // if (now - last_tick >= 5) {
+    //     lv_tick_inc(5);
+    //     last_tick = now;
+    // }
     
     // 按钮处理
     if (digitalRead(BTN_PIN) == LOW) {
