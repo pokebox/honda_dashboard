@@ -1,9 +1,11 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
+#include "config.h"
+
+#ifdef USE_DISPLAY
 #include <Arduino_GFX_Library.h>
 #include <lvgl.h>
-#include "config.h"
 
 class DisplayManager {
 public:
@@ -29,4 +31,5 @@ private:
     DisplayManager& operator=(const DisplayManager&) = delete;
 };
 
+#endif // USE_DISPLAY
 #endif // DISPLAY_H

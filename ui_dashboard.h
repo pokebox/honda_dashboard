@@ -1,9 +1,9 @@
 #ifndef UI_DASHBOARD_H
 #define UI_DASHBOARD_H
 
-#include <lvgl.h>
 #include "config.h"
-
+#ifdef USE_DISPLAY
+#include <lvgl.h>
 class DashboardUI {
 public:
     static DashboardUI& getInstance();
@@ -59,5 +59,5 @@ private:
     DashboardUI(const DashboardUI&) = delete;
     DashboardUI& operator=(const DashboardUI&) = delete;
 };
-
+#endif // USE_DISPLAY
 #endif // UI_DASHBOARD_H

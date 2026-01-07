@@ -1,6 +1,7 @@
 #include "display.h"
 #include <SPI.h>
 
+#ifdef USE_DISPLAY
 // 静态成员初始化
 lv_disp_t* DisplayManager::primary_disp = nullptr;
 
@@ -83,3 +84,4 @@ void DisplayManager::toggleRotation() {
 lv_disp_t* DisplayManager::getPrimaryDisplay() const {
     return primary_disp;
 }
+#endif // USE_DISPLAY

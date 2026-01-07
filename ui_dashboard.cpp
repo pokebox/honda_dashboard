@@ -1,6 +1,7 @@
 #include "ui_dashboard.h"
 #include "lv_conf.h"
 
+#ifdef USE_DISPLAY
 DashboardUI& DashboardUI::getInstance() {
     static DashboardUI instance;
     return instance;
@@ -158,3 +159,4 @@ void DashboardUI::setTitle(const char* title) {
 void DashboardUI::update() {
     // 基本的UI更新逻辑，具体数据更新在外部完成
 }
+#endif

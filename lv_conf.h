@@ -11,9 +11,9 @@
  *    - define `LV_CONF_INCLUDE_SIMPLE`
  *    - add the path as include path
  */
-
+#include "config.h"
 /* clang-format off */
-#if 1 /*Set it to "1" to enable content*/
+#ifdef USE_DISPLAY /*Set it to "1" to enable content*/
 
 #ifndef LV_CONF_H
 #define LV_CONF_H

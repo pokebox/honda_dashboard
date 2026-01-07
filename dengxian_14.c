@@ -3,7 +3,8 @@
  * Bpp: 4
  * Opts: --bpp 4 --size 14 --no-compress --stride 1 --align 1 --font DENGB.TTF --symbols 主驾驶门副驾左后右备箱本田车辆状态监控发动机转速车速当前档位横向加速度纵向水温进气温度油耗变速箱速度本次里程轮胎压仪表盘未锁定已成功失败升级降无法访问数据前后上中下等灯开关熄灭电量点亮电压流头尾顶底盘连接断设备调试接口插座启动停止刹车保持开启关闭节能模式方向盘解防滑身体稳定系统值重力禁用激活取消电脑任务车身代码编号车窗过热冷空调故障错误数量转向角度传感器氧气排放爆震扭矩力量经济轮巡航按钮安全带囊排乘员RPMkm/hm/s²°℃1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ --format lvgl -o dengxian_14.c
  ******************************************************************************/
-
+#include "config.h"
+#ifdef USE_DISPLAY
 #ifdef __has_include
     #if __has_include("lvgl.h")
         #ifndef LV_LVGL_H_INCLUDE_SIMPLE
@@ -23,7 +24,7 @@
 #ifndef DENGXIAN_14
 #define DENGXIAN_14 1
 #endif
-
+#endif
 #if DENGXIAN_14
 
 /*-----------------

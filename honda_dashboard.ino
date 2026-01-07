@@ -8,8 +8,10 @@
 
 
 // 全局对象引用
+#ifdef USE_DISPLAY
 DisplayManager& display = DisplayManager::getInstance();
 DashboardUI& dashboard = DashboardUI::getInstance();
+#endif
 HondaCAN CAN;
 
 CarDataProcessor carProcessor(CAN);
@@ -47,21 +49,13 @@ void setup() {
     #endif
 
     #ifdef USE_BLE
-        configBLE();
-    #endif
     // 启动蓝牙LE
     if (!RCDEV.start()) {
         Serial.println("蓝牙LE初始化失败!");
         ESP.restart();
     }
+    #endif
 
-    // 初始化显示
-    Serial.println("初始化显示...");
-    if (!display.init()) {
-        Serial.println("显示初始化失败!");
-        ESP.restart();
-    }
-    
     // 创建CAN任务
     xTaskCreatePinnedToCore(
         canTask,
@@ -72,7 +66,14 @@ void setup() {
         NULL,
         0
     );
-    
+
+    #ifdef USE_DISPLAY
+    // 初始化显示
+    Serial.println("初始化显示...");
+    if (!display.init()) {
+        Serial.println("显示初始化失败!");
+        ESP.restart();
+    }
     // 创建仪表盘界面
     dashboard.create();
     
@@ -81,6 +82,7 @@ void setup() {
     Serial.printf("车辆VIN: %s\n", car_vin.c_str());
     String title = "Honda 车辆状态监控 - " + car_vin;
     dashboard.setTitle(title.c_str());
+    #endif
     
     Serial.println("系统启动完成!");
 }
@@ -89,7 +91,7 @@ void loop() {
     static uint32_t last_tick = 0;
     uint32_t now = millis();
 
-    #if 0
+    #ifdef USE_DISPLAY
     // 按钮处理
     if (digitalRead(BTN_PIN) == LOW) {
         display.toggleRotation();
@@ -131,10 +133,6 @@ void loop() {
         free(data);
 #endif
 #ifdef USE_BLE
-        // 处理BLE数据
-        BLE_CAN_Characteristic->setValue(reinterpret_cast<uint8_t*>(&CAN.can_message.identifier), sizeof(CAN.can_message.identifier));
-        BLE_CAN_Characteristic->notify();
-#endif
         uint8_t cdata[20];
         // Insert 32-bit packet ID as little-endian integer at the beginning
         cdata[0] = static_cast<uint8_t>(CAN.can_message.identifier);
@@ -150,7 +148,7 @@ void loop() {
         // }
         // Serial.println();
         // RCDEV.stats();
-
+#endif
         last_tick = CAN.updateTime;
         
     }
@@ -173,6 +171,7 @@ void canTask(void *arg) {
     }
 }
 
+#ifdef USE_DISPLAY
 void updateDashboard() {
     static uint32_t last_update = 0;
     uint32_t now = millis();
@@ -270,3 +269,4 @@ void updateDashboard() {
     
     last_update = now;
 }
+#endif
