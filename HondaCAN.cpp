@@ -238,7 +238,7 @@ void HondaCAN::parseEngineData(uint8_t data[8])
   EngineData.ODOMETER = data[6] * 10;
 }
 
-// 解析ENGINE_DATA_3 (需要定义ID)
+// 解析ENGINE_DATA_3 804
 void HondaCAN::parseEngineData3(uint8_t data[8])
 {
   EngineDataThree.ENGINE_TEMP = data[0] - 40;
