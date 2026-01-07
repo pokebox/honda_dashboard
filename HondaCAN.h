@@ -21,6 +21,8 @@ public:
     const int CAN_RS = 3;         // CAN速率选择引脚（LOW=高速模式，HIGH=低功耗监听模式）
     const int SENSE_V_ANA = 35;   // 电压检测模拟输入引脚
     int CAN_BIT = 11;       // CAN帧标识符位数（11位或29位）
+    
+    twai_message_t can_message;
 
     // ================== 公开的数据结构 ==================
     

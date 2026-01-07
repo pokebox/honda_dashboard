@@ -41,6 +41,7 @@ ESP_NOW_Broadcast_Peer broadcast_peer(ESPNOW_WIFI_CHANNEL, WIFI_IF_STA, NULL);
 #ifdef USE_BLE
 #include <BLEServer.h>
 #include <BLEDevice.h>
+#include <BLE2902.h>
 
 #define RACECHRONO_UUID "00001ff8-0000-1000-8000-00805f9b34fb"
 
@@ -65,6 +66,7 @@ class ServerCallbacks : public BLEServerCallbacks
   {
     deviceConnected = false;
     Serial.println("[I] Bluetooth client disconnected!");
+    BLEDevice::startAdvertising();
   }
 };
 
@@ -77,8 +79,8 @@ void configBLE()
   BLEService *BLE_service = BLE_server->createService(RACECHRONO_UUID);
 
   // GPS main characteristic definition
-  BLE_CAN_Characteristic = BLE_service->createCharacteristic(BLEUUID((uint16_t)0x1), BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY | BLECharacteristic::PROPERTY_INDICATE);
-  //BLE_CAN_Characteristic->addDescriptor(new BLE2902());
+  BLE_CAN_Characteristic = BLE_service->createCharacteristic(/*BLEUUID((uint16_t)0x1)*/(uint16_t)0x1, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY /* | BLECharacteristic::PROPERTY_INDICATE*/);
+  BLE_CAN_Characteristic->addDescriptor(new BLE2902());
 
   BLE_service->start();
 

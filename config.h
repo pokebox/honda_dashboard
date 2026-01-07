@@ -18,8 +18,8 @@
 #define SCREEN_HEIGHT 320
 
 // 网络配置
-#define USE_BROADCAST
-// #define USE_BLE
+//#define USE_BROADCAST
+#define USE_BLE
 
 #ifdef USE_BROADCAST
 #define ESPNOW_WIFI_CHANNEL 6

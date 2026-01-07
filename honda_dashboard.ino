@@ -30,6 +30,7 @@ void setup() {
     
 
     #ifdef USE_BROADCAST
+        Serial.println("初始化广播...");
         WiFi.mode(WIFI_STA);
         WiFi.setChannel(ESPNOW_WIFI_CHANNEL);
         while (!WiFi.STA.started()) {
@@ -49,6 +50,7 @@ void setup() {
     #endif
 
     // 初始化显示
+    Serial.println("初始化显示...");
     if (!display.init()) {
         Serial.println("显示初始化失败!");
         ESP.restart();
@@ -80,13 +82,8 @@ void setup() {
 void loop() {
     static uint32_t last_tick = 0;
     uint32_t now = millis();
-    
-    // // 更新LVGL tick
-    // if (now - last_tick >= 5) {
-    //     lv_tick_inc(5);
-    //     last_tick = now;
-    // }
-    
+
+    #if 0
     // 按钮处理
     if (digitalRead(BTN_PIN) == LOW) {
         display.toggleRotation();
@@ -98,7 +95,43 @@ void loop() {
     
     // 处理LVGL任务
     lv_timer_handler();
+    #endif
     
+    if (CAN.updateTime != last_tick)
+    {
+        carProcessor.updateData();
+
+        // 广播数据
+#ifdef USE_BROADCAST
+        // CarStatus *car_data = carProcessor.getCarStatus();
+        // size_t packed_size = car_status__get_packed_size(car_data);
+        ALLDATA *all_data = carProcessor.getAllData();
+        size_t packed_size = all__data__get_packed_size(all_data);
+        uint8_t *data = (uint8_t*)malloc(packed_size);
+        if (data == NULL) {
+            Serial.println("Failed to allocate memory for packet");
+            // 释放缓冲区
+            free(data);
+            vTaskDelay(pdMS_TO_TICKS(1));
+            return;
+        }
+        //car_status__pack(car_data, data);
+        all__data__pack(all_data, data);
+
+        if (!broadcast_peer.send_message(data, packed_size)) {
+            Serial.println("Failed to broadcast message "+ String(packed_size));
+        }
+        // 释放缓冲区
+        free(data);
+#endif
+#ifdef USE_BLE
+        // 处理BLE数据
+        BLE_CAN_Characteristic->setValue(reinterpret_cast<uint8_t*>(&CAN.can_message.identifier), sizeof(CAN.can_message.identifier));
+        BLE_CAN_Characteristic->notify();
+#endif
+        last_tick = CAN.updateTime;
+        
+    }
     delay(1);
 }
 
@@ -114,31 +147,6 @@ void canTask(void *arg) {
             vTaskDelay(pdMS_TO_TICKS(1));
             continue;
         }
-        carProcessor.updateData();
-
-        // 广播数据
-#ifdef USE_BROADCAST
-        // CarStatus *car_data = carProcessor.getCarStatus();
-        // size_t packed_size = car_status__get_packed_size(car_data);
-        ALLDATA *all_data = carProcessor.getAllData();
-        size_t packed_size = all__data__get_packed_size(all_data);
-        uint8_t *data = (uint8_t*)malloc(packed_size);
-        if (data == NULL) {
-            Serial.println("Failed to allocate memory for packet");
-            vTaskDelay(pdMS_TO_TICKS(1));
-            continue;
-        }
-        //car_status__pack(car_data, data);
-        all__data__pack(all_data, data);
-
-        if (!broadcast_peer.send_message(data, packed_size)) {
-            Serial.println("Failed to broadcast message "+ String(packed_size));
-        }
-        // 释放缓冲区
-        free(data);
-#endif
-        last_can_update = CAN.updateTime;
-        
         vTaskDelay(pdMS_TO_TICKS(1));
     }
 }

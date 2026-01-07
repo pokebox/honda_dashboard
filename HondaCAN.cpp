@@ -33,6 +33,7 @@ void HondaCAN::run()
   bool updated = false;
   if (twai_receive(&message, pdMS_TO_TICKS(10)) == ESP_OK)
   {
+    can_message = message;
     switch (message.identifier)
     {
     case POWERTRAIN_DATA_ID:
@@ -142,7 +143,7 @@ void HondaCAN::run()
   if (updated)
   {
     updateTime = millis();
-    int gear = calculateHondaCivicGear(EngineData.ENGINE_RPM, EngineData.XMISSION_SPEED);
+    int gear = calculateHondaCivicGear(Powertrain.ENGINE_RPM, EngineData.XMISSION_SPEED);
     if (gear <= 0) {
       gear = 0;
     }
