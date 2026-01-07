@@ -4,6 +4,7 @@
 #include "honda_data.pb-c.h"
 #include "carDataProcessor.hpp"
 #include "esp_broadcast.hpp"
+#include "device.hpp"
 
 
 // 全局对象引用
@@ -48,6 +49,11 @@ void setup() {
     #ifdef USE_BLE
         configBLE();
     #endif
+    // 启动蓝牙LE
+    if (!RCDEV.start()) {
+        Serial.println("蓝牙LE初始化失败!");
+        ESP.restart();
+    }
 
     // 初始化显示
     Serial.println("初始化显示...");
@@ -129,6 +135,22 @@ void loop() {
         BLE_CAN_Characteristic->setValue(reinterpret_cast<uint8_t*>(&CAN.can_message.identifier), sizeof(CAN.can_message.identifier));
         BLE_CAN_Characteristic->notify();
 #endif
+        uint8_t cdata[20];
+        // Insert 32-bit packet ID as little-endian integer at the beginning
+        cdata[0] = static_cast<uint8_t>(CAN.can_message.identifier);
+        cdata[1] = static_cast<uint8_t>(CAN.can_message.identifier >> 8);
+        cdata[2] = static_cast<uint8_t>(CAN.can_message.identifier >> 16);
+        cdata[3] = static_cast<uint8_t>(CAN.can_message.identifier >> 24);
+        // Copy payload data starting from byte 4
+        memcpy(cdata + sizeof(uint32_t), CAN.can_message.data, CAN.can_message.data_length_code);
+        RCDEV.send(cdata, sizeof(uint32_t) + CAN.can_message.data_length_code);
+        // Serial.printf("Sent CAN message: 0x%08X, Data: ", CAN.can_message.identifier);
+        // for (int i = 0; i < sizeof(uint32_t) + CAN.can_message.data_length_code; i++) {
+        //     Serial.printf("%02X ", cdata[i]);
+        // }
+        // Serial.println();
+        // RCDEV.stats();
+
         last_tick = CAN.updateTime;
         
     }
